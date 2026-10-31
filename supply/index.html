@@ -359,7 +359,7 @@ function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_C
     '<div class="mbody" id="m_body"></div>'+
     '<datalist id="unitlist"></datalist>'+
     '<table><thead><tr><th style="width:128px">ว.ด.ป.</th><th>สถานที่</th><th style="width:60px">น้ำหวาน</th><th style="width:48px">ขนม</th><th style="width:48px">ข้าว</th><th style="width:64px">ผู้บริจาค<br>(รับจริง)</th><th class="noprint" style="width:30px"></th></tr></thead><tbody id="m_rows"></tbody></table>'+
-    '<div class="sign"><div class="line1">จึงเรียนมาเพื่อโปรดพิจารณา</div><div class="sb"><div>(&nbsp;<input class="fin" id="m_signer" style="text-align:center;width:230px">&nbsp;)</div><div><input class="fin" id="m_position" style="text-align:center;width:260px"></div></div></div>'+
+    '<div class="sign"><div class="line1">จึงเรียนมาเพื่อโปรดพิจารณา</div><div class="sb"><div>(&nbsp;<input class="fin" id="m_signer" style="text-align:center;width:300px">&nbsp;)</div><div><input class="fin" id="m_position" style="text-align:center;width:300px"></div></div></div>'+
     '</div></div>';
   memoBuilt=true;
   $('#m_org').value=cfg.org||'';$('#m_subject').value=cfg.subject||'';$('#m_to').value=cfg.to||'';
@@ -391,19 +391,28 @@ function garudaSVG(){return '<svg viewBox="0 0 64 64" width="64" height="64" ari
 /* print + copy */
 $('#printBtn').addEventListener('click',exportPDF);
 function exportPDF(){
-  var page=document.getElementById('memoPage');
-  if(!page){toast('ยังไม่มีเอกสาร');return}
+  var src=document.getElementById('memoPage');
+  if(!src){toast('ยังไม่มีเอกสาร');return}
   if(!window.html2canvas||!(window.jspdf&&window.jspdf.jsPDF)){window.print();return}
   var btn=$('#printBtn'),old=btn.textContent;btn.textContent='⏳ กำลังสร้าง…';btn.disabled=true;
-  page.classList.add('cap');
+  var clone=src.cloneNode(true);
+  Array.prototype.forEach.call(clone.querySelectorAll('input'),function(inp){
+    var sp=document.createElement('span');sp.textContent=inp.value;var cs=getComputedStyle(inp);
+    sp.style.textAlign=cs.textAlign;sp.style.flex=inp.style.flex||'';sp.style.display='inline-block';
+    sp.style.whiteSpace='pre-wrap';sp.style.wordBreak='break-word';if(inp.style.width)sp.style.minWidth=inp.style.width;
+    inp.parentNode.replaceChild(sp,inp);
+  });
+  Array.prototype.forEach.call(clone.querySelectorAll('.noprint'),function(e){if(e.parentNode)e.parentNode.removeChild(e)});
+  clone.style.position='fixed';clone.style.left='-10000px';clone.style.top='0';clone.style.width='780px';clone.style.background='#fff';
+  document.body.appendChild(clone);
   var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
-  ready.then(function(){return html2canvas(page,{scale:2,backgroundColor:'#ffffff',windowWidth:page.scrollWidth})}).then(function(canvas){
+  ready.then(function(){return html2canvas(clone,{scale:2,backgroundColor:'#ffffff',width:780,windowWidth:820})}).then(function(canvas){
     var pdf=new window.jspdf.jsPDF('p','mm','a4'),pw=210,ph=297,fullH=canvas.height*pw/canvas.width;
     if(fullH<=ph){pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pw,fullH)}
-    else{var sh=Math.floor(canvas.width*ph/pw),y=0,first=true;
-      while(y<canvas.height){var hh=Math.min(sh,canvas.height-y);var c2=document.createElement('canvas');c2.width=canvas.width;c2.height=hh;c2.getContext('2d').drawImage(canvas,0,y,canvas.width,hh,0,0,canvas.width,hh);if(!first)pdf.addPage();pdf.addImage(c2.toDataURL('image/png'),'PNG',0,0,pw,hh*pw/canvas.width);y+=hh;first=false}}
-    pdf.save('ใบสรุปเบิกของ-'+(sumMonth==='all'?'ทั้งหมด':sumMonth)+'.pdf');toast('บันทึก PDF แล้ว ✓ เปิดเพื่อปริ้นต์ได้');
-  }).catch(function(){toast('สร้าง PDF ไม่ได้ ลองใหม่')}).finally(function(){page.classList.remove('cap');btn.textContent=old;btn.disabled=false})}
+    else{var shh=Math.floor(canvas.width*ph/pw),y=0,first=true;
+      while(y<canvas.height){var hh=Math.min(shh,canvas.height-y);var c2=document.createElement('canvas');c2.width=canvas.width;c2.height=hh;c2.getContext('2d').drawImage(canvas,0,y,canvas.width,hh,0,0,canvas.width,hh);if(!first)pdf.addPage();pdf.addImage(c2.toDataURL('image/png'),'PNG',0,0,pw,hh*pw/canvas.width);y+=hh;first=false}}
+    pdf.save('ใบสรุปเบิกของ-'+(sumMonth==='all'?'ทั้งหมด':sumMonth)+'.pdf');toast('บันทึก PDF แล้ว ✓');
+  }).catch(function(){toast('สร้าง PDF ไม่ได้ ลองใหม่')}).finally(function(){if(clone.parentNode)clone.parentNode.removeChild(clone);btn.textContent=old;btn.disabled=false})}
 $('#addRowBtn').addEventListener('click',function(){memoRows.push({d:'',place:'',water:'',snack:'',rice:'',donors:''});saveMemoRows();renderMemoRows();var inps=$('#m_rows').querySelectorAll('tr:last-child input');if(inps[0])inps[0].focus()});
 $('#pullBtn').addEventListener('click',function(){if(memoRows.length&&!window.confirm('ดึงข้อมูลจากรายการที่บันทึกไว้ จะเขียนทับสิ่งที่พิมพ์แก้ในตารางนี้ ดำเนินการไหม?'))return;memoRows=rowsFromRecords();saveMemoRows();renderMemoRows();toast('ดึงข้อมูลจากที่บันทึกแล้ว ✓')});
 $('#copyMemoBtn').addEventListener('click',function(){
