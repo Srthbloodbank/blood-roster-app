@@ -1,5 +1,5 @@
 /* Service worker สำหรับ "เบิกของออกหน่วย" (PWA) — cache app shell */
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE = 'supply-bb-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.json', './garuda.png'];
 
@@ -18,9 +18,13 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
   if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).then(function (res) {
-      var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put('./index.html', copy); }); return res;
-    }).catch(function () { return caches.match('./index.html').then(function (r) { return r || caches.match('./'); }); }));
+    // แสดงจากแคชทันที (เร็ว) แล้วอัปเดตเบื้องหลังสำหรับครั้งถัดไป
+    e.respondWith(caches.match('./index.html').then(function (cached) {
+      var net = fetch(req).then(function (res) {
+        var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put('./index.html', copy); }); return res;
+      }).catch(function () { return cached; });
+      return cached || net;
+    }));
     return;
   }
   if (url.origin === self.location.origin) {

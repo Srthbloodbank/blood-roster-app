@@ -13,7 +13,9 @@
 <meta name="apple-mobile-web-app-title" content="Supply BB">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --brand-a:#06b6d4; --brand-b:#3b82f6;
@@ -255,8 +257,7 @@ var extraItems=[];
 function renderExtras(){var wrap=$('#extraRows');if(!wrap)return;wrap.innerHTML='';
   extraItems.forEach(function(it,i){var row=el('div','catrow');
     row.innerHTML='<div class="cic">📦</div><input type="text" class="exn" data-i="'+i+'" placeholder="ชื่อรายการ เช่น นม, กาแฟ" style="flex:1" autocomplete="off"><input type="number" class="exq" data-i="'+i+'" min="0" inputmode="numeric" placeholder="จำนวน" style="width:88px"><button type="button" class="iconbtn danger exdel" data-i="'+i+'" title="ลบ">✕</button>';
-    row.querySelector('.exn').value=it.n||'';row.querySelector('.exq').value=(it.q||it.q===0)?it.q:'';
-    if(it.q===0||it.q==='')row.querySelector('.exq').value=it.q===0?'':it.q;
+    row.querySelector('.exn').value=it.n||'';row.querySelector('.exq').value=it.q||'';
     wrap.appendChild(row)})}
 function encNote(note,extra){if(extra&&extra.length)return JSON.stringify({t:note||'',x:extra});return note||''}
 function decNote(s){s=String(s||'');if(s.charAt(0)==='{'){try{var o=JSON.parse(s);if(o&&Object.prototype.hasOwnProperty.call(o,'t')&&Array.isArray(o.x))return {note:String(o.t||''),extra:o.x}}catch(e){}}return {note:s,extra:[]}}
