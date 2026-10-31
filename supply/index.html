@@ -91,7 +91,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 
 .memoscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
 .memo{width:780px;margin:0 auto;background:#fff;color:#000;font-family:"Sarabun","TH Sarabun New",serif;font-size:16px;line-height:1.55;padding:40px 54px 48px}
-.memo .garuda{width:66px;height:66px;margin:0 auto 2px;display:block;opacity:.9}
+.memo .garuda{width:74px;height:auto;margin:0 auto 4px;display:block}
 .memo .mt{text-align:center;font-weight:700;font-size:26px;letter-spacing:.5px;margin:2px 0 14px}
 .memo .frow{display:flex;gap:6px;margin:3px 0;align-items:flex-end}
 .memo .frow .lab{font-weight:700;white-space:nowrap}
@@ -292,7 +292,7 @@ function renderSummary(){if(!records.length){$('#memoHost').innerHTML='';$('#mem
   buildMonthOptions();buildMemo();updateMemo(filteredRecords())}
 function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_COLS.map(function(c){return '<th>'+c.h+'</th>'}).join('');
   host.innerHTML='<div class="memoscroll"><div class="memo" id="memoPage">'+
-    '<div class="garuda">'+garudaSVG()+'</div><div class="mt">บันทึกข้อความ</div>'+
+    '<img class="garuda" src="garuda.png" alt="ตราครุฑ"><div class="mt">บันทึกข้อความ</div>'+
     '<div class="frow"><span class="lab">ส่วนราชการ</span><input class="fin" id="m_org" style="flex:1"></div>'+
     '<div class="two"><div><span class="lab">ที่</span><input class="fin" id="m_docno"></div><div><span class="lab">วันที่</span><input class="fin" id="m_docdate"></div></div>'+
     '<div class="frow"><span class="lab">เรื่อง</span><input class="fin" id="m_subject" style="flex:1"></div>'+

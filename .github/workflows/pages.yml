@@ -31,7 +31,7 @@ jobs:
              icon-192.png icon-512.png icon-maskable-512.png \
              apple-touch-icon.png favicon.ico _site/
           mkdir -p _site/supply
-          cp supply/index.html supply/manifest.json supply/sw.js _site/supply/
+          cp supply/index.html supply/manifest.json supply/sw.js supply/garuda.png _site/supply/
 
       - name: Configure Pages (เปิด Pages ให้อัตโนมัติ)
         uses: actions/configure-pages@v5

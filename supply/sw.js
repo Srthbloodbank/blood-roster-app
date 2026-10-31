@@ -1,7 +1,7 @@
 /* Service worker สำหรับ "เบิกของออกหน่วย" (PWA) — cache app shell */
 const VERSION = 'v1';
 const CACHE = 'supply-bb-' + VERSION;
-const SHELL = ['./', './index.html', './manifest.json'];
+const SHELL = ['./', './index.html', './manifest.json', './garuda.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) {
