@@ -74,7 +74,8 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .catrow.cat-rice{background:color-mix(in srgb,var(--rice) 13%,var(--card));border-color:color-mix(in srgb,var(--rice) 35%,var(--line))}
 .catrow.cat-rice .cic{background:color-mix(in srgb,var(--rice) 22%,var(--card))}
 .catrow.cat-rice .cn b{color:var(--rice)}
-.catrow .cic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:27px;flex:none;background:var(--card);border:1px solid var(--line);animation:bop 3s ease-in-out infinite}
+.catrow .cic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:27px;flex:none;background:#fff;border:1px solid var(--line);overflow:hidden;animation:bop 3s ease-in-out infinite}
+.catrow .cic img{width:100%;height:100%;object-fit:contain;display:block}
 .cat-water .cic{animation-delay:.5s}.cat-rice .cic{animation-delay:1s}
 @keyframes bop{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .catrow .cn{flex:1;min-width:0}.catrow .cn b{display:block;font-size:15px}.catrow .cn span{font-size:12.5px;color:var(--mute)}
@@ -207,7 +208,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-var CATS=[{key:'snack',name:'ขนม',icon:'🍪',unit:'ชุด'},{key:'water',name:'น้ำหวาน',icon:'💧',unit:'ที่'},{key:'rice',name:'ข้าว',icon:'🍚',unit:'ชุด'}];
+var CATS=[{key:'snack',name:'ขนม',icon:'🍪',unit:'ชุด',img:'ic-snack.png'},{key:'water',name:'น้ำหวาน',icon:'💧',unit:'ที่',img:'ic-water.png'},{key:'rice',name:'ข้าว',icon:'🍚',unit:'ชุด',img:'ic-rice.png'}];
 var MEMO_COLS=[{key:'water',h:'น้ำหวาน'},{key:'snack',h:'ขนม'},{key:'rice',h:'ข้าว'}];
 var TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 var TH_MFULL=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
@@ -267,7 +268,7 @@ function getDateISO(){var d=+$('#d_day').value,m=+$('#d_mon').value,y=(+$('#d_ye
 /* steppers */
 (function(){var wrap=$('#catRows');
   CATS.forEach(function(c){var row=el('div','catrow cat-'+c.key);
-    row.innerHTML='<div class="cic">'+c.icon+'</div><div class="cn"><b>'+c.name+'</b><span>หน่วย: '+c.unit+'</span></div>'+
+    row.innerHTML='<div class="cic"><img src="'+c.img+'" alt="'+c.name+'"></div><div class="cn"><b>'+c.name+'</b><span>หน่วย: '+c.unit+'</span></div>'+
       '<div class="stepper"><button type="button" data-step="-1" data-k="'+c.key+'" aria-label="ลด'+c.name+'">−</button><input type="number" id="q_'+c.key+'" min="0" value="0" inputmode="numeric" aria-label="จำนวน'+c.name+'"><button type="button" data-step="1" data-k="'+c.key+'" aria-label="เพิ่ม'+c.name+'">+</button></div>';
     wrap.appendChild(row)});
   wrap.addEventListener('click',function(e){var b=e.target.closest('button[data-step]');if(!b)return;var inp=document.getElementById('q_'+b.dataset.k);inp.value=Math.max(0,num(inp.value)+(+b.dataset.step));liveTotal()});

@@ -32,6 +32,7 @@ jobs:
              apple-touch-icon.png favicon.ico _site/
           mkdir -p _site/supply
           cp supply/index.html supply/manifest.json supply/sw.js supply/garuda.png supply/cover.png \
+             supply/ic-water.png supply/ic-snack.png supply/ic-rice.png \
              supply/icon-192.png supply/icon-512.png supply/icon-maskable-512.png \
              supply/apple-touch-icon.png supply/favicon.ico _site/supply/
 
