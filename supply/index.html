@@ -49,8 +49,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .bar{display:flex;align-items:center;gap:12px;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0));padding-right:max(16px,env(safe-area-inset-right,0));max-width:900px;margin:0 auto}
 .logo{flex:none;width:42px;height:42px;border-radius:12px;background:#fff;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .logo svg{width:30px;height:30px;display:block}
+.bar .tt{flex:1;min-width:0}
+.helpbtn{flex:none;background:rgba(0,0,0,.04);color:var(--acc);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;font-size:19px;font-weight:800}
+.helpbtn:hover{background:rgba(0,0,0,.08)}
 .tt h1{font-size:20px;line-height:1.2;color:var(--top-title);font-weight:800;letter-spacing:.3px}.tt .sub{color:var(--mute);font-size:12px;font-weight:600;letter-spacing:.3px}
-.tbtn{margin-left:auto;flex:none;background:rgba(0,0,0,.04);color:var(--acc);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;font-size:17px}
+.tbtn{flex:none;background:rgba(0,0,0,.04);color:var(--acc);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;font-size:17px}
 .tbtn:hover{background:rgba(0,0,0,.08)}
 nav{display:flex;background:color-mix(in srgb,var(--card) 84%,transparent);padding:6px max(10px,env(safe-area-inset-left,0)) 6px max(10px,env(safe-area-inset-right,0));overflow-x:auto}
 nav .inner{display:flex;gap:4px;max-width:900px;margin:0 auto;width:100%}
@@ -143,6 +146,17 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .banner{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:11px;background:var(--okbg);color:var(--ink);font-size:13px;font-weight:600;margin-bottom:14px}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0));transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.3);font-weight:600;font-size:14px;opacity:0;transition:.25s;z-index:50;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center;background:rgba(40,15,30,.45)}
+.modal.show{display:flex}
+.modal-card{background:var(--card-soft);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:24px 24px 0 0;box-shadow:0 -8px 34px rgba(0,0,0,.3);padding:20px max(18px,env(safe-area-inset-left,0)) calc(20px + env(safe-area-inset-bottom,0)) max(18px,env(safe-area-inset-right,0))}
+@media (min-width:560px){.modal{align-items:center}.modal-card{border-radius:24px}}
+.modal-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.modal-h h2{font-size:20px;color:var(--acc);flex:1}
+.modal-x{border:1px solid var(--line);background:var(--field);border-radius:10px;width:38px;height:38px;font-size:16px;color:var(--mute);flex:none;cursor:pointer}
+.hstep{display:flex;gap:12px;padding:12px 13px;border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:10px}
+.hstep .hic{font-size:24px;flex:none;width:32px;text-align:center}
+.hstep b{display:block;margin-bottom:3px;color:var(--acc);font-size:15px}
+.hstep span{font-size:13px;color:var(--ink);line-height:1.6}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 /* ===== PRINT: เหลือเฉพาะเอกสาร พอดี A4 ===== */
@@ -165,6 +179,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 <div class="topbar">
   <div class="bar">
     <div class="tt"><h1>Supply BB</h1><div class="sub">BLOOD BANK · SURAT THANI</div></div>
+    <button class="helpbtn" id="helpBtn" title="วิธีใช้งาน" aria-label="วิธีใช้งาน">?</button>
     <button class="tbtn" id="themeBtn" title="สลับโหมดสว่าง/มืด" aria-label="สลับธีม">◐</button>
   </div>
   <nav><div class="inner" id="tabs">
@@ -210,6 +225,18 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
   <div class="cutefoot"><div class="em">🍙 🥤 🍪 🩷</div>ทำด้วยใจ · ธนาคารเลือด รพ.สุราษฎร์ธานี</div>
 </main>
 <div class="toast" id="toast" role="status"></div>
+
+<div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-label="วิธีใช้งาน">
+  <div class="modal-card">
+    <div class="modal-h"><h2>📖 วิธีใช้งาน</h2><button class="modal-x" id="helpClose" aria-label="ปิด">✕</button></div>
+    <div class="hstep"><div class="hic">➕</div><div><b>บันทึกเบิก</b><span>เลือกวันที่ (หน่วย/สถานที่จะขึ้นให้เองตามแผนเวรแพทย์) → ใส่จำนวนผู้บริจาค และจำนวน ขนม/น้ำหวาน/ข้าว → ถ้ามีของเพิ่มกด “เพิ่มรายการอื่น” → กด “บันทึกการเบิก” (เก็บลง Google Sheet อัตโนมัติ)</span></div></div>
+    <div class="hstep"><div class="hic">📋</div><div><b>ประวัติ</b><span>ดูรายการย้อนหลังทั้งหมด · กดปุ่ม “💬 LINE” เพื่อคัดลอกข้อความส่งไลน์ · กดแก้ไข/ลบรายการได้</span></div></div>
+    <div class="hstep"><div class="hic">📄</div><div><b>ใบสรุปงาน</b><span>เลือกเดือน → เอกสารบันทึกข้อความราชการขึ้นให้อัตโนมัติ · แตะแก้ช่องต่างๆ ได้ (เลขที่/วันที่/ชื่อผู้ลงนาม/ตัวเลขในตาราง) · กด “🖨️ ปริ้นต์เอกสาร” ได้ไฟล์ PDF ส่ง/พิมพ์ได้ · “📋 คัดลอก” คัดลอกเป็นข้อความ</span></div></div>
+    <div class="hstep"><div class="hic">☀️</div><div><b>ธีม & ติดตั้งแอป</b><span>ปุ่ม ◐ มุมขวาบน สลับโหมดสว่าง/มืด · เพิ่มลงจอโฮม (ปุ่มแชร์ → เพิ่มไปยังหน้าจอโฮม) ใช้เหมือนแอป เปิดออฟไลน์ได้</span></div></div>
+    <div class="hstep"><div class="hic">💾</div><div><b>ข้อมูลใช้ร่วมกัน</b><span>ทุกการบันทึกเก็บใน Google Sheet “Supply BB” ทีมที่เปิดลิงก์เดียวกันเห็นข้อมูลชุดเดียวกัน</span></div></div>
+    <button class="btn primary block" id="helpOk" style="margin-top:6px">เข้าใจแล้ว 🩷</button>
+  </div>
+</div>
 
 <script>
 var CATS=[{key:'snack',name:'ขนม',icon:'🍪',unit:'ชุด',img:'ic-snack.png'},{key:'water',name:'น้ำหวาน',icon:'💧',unit:'ที่',img:'ic-water.png'},{key:'rice',name:'ข้าว',icon:'🍚',unit:'ชุด',img:'ic-rice.png'}];
@@ -257,6 +284,13 @@ function seedData(){return [
 /* theme */
 (function(){try{var s=localStorage.getItem('supplyTheme');document.documentElement.setAttribute('data-theme',s||'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})();
 $('#themeBtn').addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');var dark=c==='dark'||(!c&&matchMedia('(prefers-color-scheme:dark)').matches);var n=dark?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('supplyTheme',n)}catch(e){}});
+function openHelp(){$('#helpModal').classList.add('show')}
+function closeHelp(){$('#helpModal').classList.remove('show')}
+$('#helpBtn').addEventListener('click',openHelp);
+$('#helpClose').addEventListener('click',closeHelp);
+$('#helpOk').addEventListener('click',closeHelp);
+$('#helpModal').addEventListener('click',function(e){if(e.target===this)closeHelp()});
+try{if(!localStorage.getItem('supplyHelpSeen')){setTimeout(openHelp,700);localStorage.setItem('supplyHelpSeen','1')}}catch(e){}
 
 /* date dropdowns */
 (function(){var dd=$('#d_day'),mm=$('#d_mon'),yy=$('#d_year');
