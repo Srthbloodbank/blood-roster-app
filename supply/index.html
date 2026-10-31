@@ -6,41 +6,43 @@
 <title>Supply BB</title>
 <meta name="description" content="บันทึกการเบิกของออกหน่วยรับบริจาคโลหิต ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี พร้อมใบสรุปงานพิมพ์ได้">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#14263a" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b1520" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#06b6d4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e7490" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Supply BB">
-<link rel="icon" href="../favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --navy:#14263a; --navy2:#0b1520; --acc:#a4162b; --accink:#fff;
-  --bg:#eef2f6; --card:#fff; --ink:#15202b; --mute:#5b6b7b; --line:#d3dce6; --head:#e7edf3;
-  --ok:#1d7a4d; --okbg:#d9f1e3; --warn:#c77d00; --water:#1d6fb8; --snack:#c77d00; --rice:#1d7a4d;
-  --shadow:0 1px 2px rgba(16,32,48,.06),0 2px 8px rgba(16,32,48,.05);
+  --brand-a:#06b6d4; --brand-b:#3b82f6;
+  --navy:#0e7490; --navy2:#0b5566; --acc:#f43f5e; --accink:#fff;
+  --bg:#f1f5f9; --card:#fff; --ink:#0f172a; --mute:#64748b; --line:#e2e8f0; --head:#f8fafc;
+  --ok:#10b981; --okbg:#d1fae5; --warn:#f59e0b; --water:#0ea5e9; --snack:#f59e0b; --rice:#10b981;
+  --shadow:0 1px 2px rgba(15,23,42,.06),0 6px 18px rgba(15,23,42,.07);
   color-scheme:light; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --navy:#0b1520;--navy2:#060d15;--acc:#ff6b7d;--accink:#2a0509;--bg:#0f1823;--card:#17232f;--ink:#e8eef4;--mute:#93a4b5;--line:#2c3d4e;--head:#1f3042;--ok:#6fcf97;--okbg:#17402d;--warn:#f0b040;--water:#6fb3f0;--snack:#f0b040;--rice:#6fcf97;--shadow:0 1px 2px rgba(0,0,0,.3),0 2px 10px rgba(0,0,0,.25);color-scheme:dark;
+  --brand-a:#0e7490;--brand-b:#1e40af;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
 }}
-:root[data-theme="dark"]{--navy:#0b1520;--navy2:#060d15;--acc:#ff6b7d;--accink:#2a0509;--bg:#0f1823;--card:#17232f;--ink:#e8eef4;--mute:#93a4b5;--line:#2c3d4e;--head:#1f3042;--ok:#6fcf97;--okbg:#17402d;--warn:#f0b040;--water:#6fb3f0;--snack:#f0b040;--rice:#6fcf97;--shadow:0 1px 2px rgba(0,0,0,.3),0 2px 10px rgba(0,0,0,.25);color-scheme:dark}
+:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#1e40af;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 img{max-width:100%}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font:15px/1.55 "IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0);background:var(--navy);z-index:30}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0);background:var(--brand-a);z-index:30}
 h1,h2,h3{margin:0;font-weight:700;text-wrap:balance}
 button{font:inherit;cursor:pointer}
 input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .tnum{font-variant-numeric:tabular-nums}
 
-.topbar{position:sticky;top:env(safe-area-inset-top,0);z-index:20;background:var(--navy);color:#fff;box-shadow:var(--shadow)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0);z-index:20;background:linear-gradient(120deg,var(--brand-a),var(--brand-b));color:#fff;box-shadow:var(--shadow)}
 .bar{display:flex;align-items:center;gap:12px;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0));padding-right:max(16px,env(safe-area-inset-right,0));max-width:900px;margin:0 auto}
-.logo{flex:none;width:40px;height:40px;border-radius:11px;background:var(--acc);display:grid;place-items:center;font-size:22px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.logo{flex:none;width:42px;height:42px;border-radius:12px;background:#fff;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.logo svg{width:30px;height:30px;display:block}
 .tt h1{font-size:18px;line-height:1.2}.tt .sub{color:#b8c6d4;font-size:12.5px}
 .tbtn{margin-left:auto;flex:none;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:9px;width:40px;height:40px;font-size:17px}
 .tbtn:hover{background:rgba(255,255,255,.16)}
@@ -135,7 +137,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 <body>
 <div class="topbar">
   <div class="bar">
-    <div class="logo">🩸</div>
+    <div class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="37" rx="18" ry="4.5" fill="#cbd5e1"/><ellipse cx="24" cy="35" rx="18" ry="5.5" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.3"/><rect x="9" y="14" width="13" height="19" rx="2.2" fill="#f43f5e"/><rect x="9" y="14" width="13" height="5" rx="2.2" fill="#fb7185"/><rect x="14.6" y="8" width="2.6" height="8" rx="1.3" fill="#0ea5e9"/><circle cx="15.5" cy="24" r="2.6" fill="#fff" opacity=".45"/><circle cx="32" cy="25" r="8.2" fill="#e0a155"/><circle cx="32" cy="25" r="8.2" fill="none" stroke="#c9833a" stroke-width="1.2"/><circle cx="30" cy="23" r="1.1" fill="#7c4a1e"/><circle cx="34" cy="24" r="1.1" fill="#7c4a1e"/><circle cx="32" cy="28" r="1.1" fill="#7c4a1e"/><circle cx="29.5" cy="27" r="1" fill="#7c4a1e"/></svg></div>
     <div class="tt"><h1>Supply BB</h1><div class="sub">BLOOD BANK · SURAT THANI</div></div>
     <button class="tbtn" id="themeBtn" title="สลับโหมดสว่าง/มืด" aria-label="สลับธีม">◐</button>
   </div>
@@ -290,7 +292,7 @@ function refreshPlaces(){var all=((SERVER_UNITS&&SERVER_UNITS.length)?SERVER_UNI
   ['placelist','unitlist'].forEach(function(id){var dl=document.getElementById(id);if(!dl)return;dl.innerHTML='';all.forEach(function(nm){var o=document.createElement('option');o.value=nm;dl.appendChild(o)})})}
 
 /* LINE */
-function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+p[0])+543)%100;var s='✅หน่วยรับบริจาคโลหิต '+dd+'/'+mm+'/'+yy+'\n'+'ขนม '+num(r.snack)+' ชุด\n'+'น้ำหวาน '+num(r.water)+' ที่\n'+'ข้าว '+num(r.rice)+' ชุด\n';(r.extra||[]).forEach(function(x){if(x.n)s+=x.n+' '+num(x.q)+'\n'});s+='ขอบคุณค่ะ';return s}
+function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+p[0])+543)%100;var s='✅หน่วยรับบริจาคโลหิต '+dd+'/'+mm+'/'+yy+'\n'+(r.place?'หน่วย '+r.place+'\n':'')+'ขนม '+num(r.snack)+' ชุด\n'+'น้ำหวาน '+num(r.water)+' ที่\n'+'ข้าว '+num(r.rice)+' ชุด\n';(r.extra||[]).forEach(function(x){if(x.n)s+=x.n+' '+num(x.q)+'\n'});s+='ขอบคุณค่ะ';return s}
 
 /* history */
 function renderHistory(){var wrap=$('#histWrap');wrap.innerHTML='';refreshPlaces();
