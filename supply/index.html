@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>เบิกของออกหน่วย</title>
+<title>Supply BB</title>
 <meta name="description" content="บันทึกการเบิกของออกหน่วยรับบริจาคโลหิต ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี พร้อมใบสรุปงานพิมพ์ได้">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#14263a" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b1520" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="เบิกของ">
+<meta name="apple-mobile-web-app-title" content="Supply BB">
 <link rel="icon" href="../favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
@@ -136,7 +136,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 <div class="topbar">
   <div class="bar">
     <div class="logo">🩸</div>
-    <div class="tt"><h1>เบิกของออกหน่วย</h1><div class="sub">ธนาคารเลือด รพ.สุราษฎร์ธานี</div></div>
+    <div class="tt"><h1>Supply BB</h1><div class="sub">BLOOD BANK · SURAT THANI</div></div>
     <button class="tbtn" id="themeBtn" title="สลับโหมดสว่าง/มืด" aria-label="สลับธีม">◐</button>
   </div>
   <nav><div class="inner" id="tabs">
@@ -158,7 +158,8 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
       <div class="field"><label for="f_donors">จำนวนผู้บริจาค — รับจริง (คน)</label><input type="number" id="f_donors" min="0" inputmode="numeric" placeholder="0"></div>
       <div class="field" style="margin-bottom:8px"><label>จำนวนของที่เบิก</label></div>
       <div id="catRows"></div>
-      <div class="totalbar"><b>รวมของทั้งหมด</b><span class="n tnum" id="liveTotal">0</span></div>
+      <div id="extraRows"></div>
+      <button type="button" class="btn ghost" id="addExtraBtn" style="margin-top:2px;align-self:flex-start">➕ เพิ่มรายการอื่น</button>
       <div class="field" style="margin-top:14px"><label for="f_note">หมายเหตุ (ถ้ามี)</label><textarea id="f_note" rows="2" placeholder="เช่น ของเหลือ, ฝากคนอื่นไปส่ง"></textarea></div>
       <div class="rowbtns"><button class="btn primary block" id="saveBtn">💾 บันทึกการเบิก</button><button class="btn ghost" id="cancelEdit" hidden>ยกเลิก</button></div>
       <div class="hint" id="syncLine" style="margin-top:10px"></div>
@@ -246,7 +247,17 @@ function getDateISO(){var d=+$('#d_day').value,m=+$('#d_mon').value,y=(+$('#d_ye
     wrap.appendChild(row)});
   wrap.addEventListener('click',function(e){var b=e.target.closest('button[data-step]');if(!b)return;var inp=document.getElementById('q_'+b.dataset.k);inp.value=Math.max(0,num(inp.value)+(+b.dataset.step));liveTotal()});
   wrap.addEventListener('input',liveTotal);})();
-function liveTotal(){var t=0;CATS.forEach(function(c){t+=num(document.getElementById('q_'+c.key).value)});$('#liveTotal').textContent=t}
+function liveTotal(){var e=$('#liveTotal');if(!e)return;var t=0;CATS.forEach(function(c){t+=num(document.getElementById('q_'+c.key).value)});e.textContent=t}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var extraItems=[];
+function renderExtras(){var wrap=$('#extraRows');if(!wrap)return;wrap.innerHTML='';
+  extraItems.forEach(function(it,i){var row=el('div','catrow');
+    row.innerHTML='<div class="cic">📦</div><input type="text" class="exn" data-i="'+i+'" placeholder="ชื่อรายการ เช่น นม, กาแฟ" style="flex:1" autocomplete="off"><input type="number" class="exq" data-i="'+i+'" min="0" inputmode="numeric" placeholder="จำนวน" style="width:88px"><button type="button" class="iconbtn danger exdel" data-i="'+i+'" title="ลบ">✕</button>';
+    row.querySelector('.exn').value=it.n||'';row.querySelector('.exq').value=(it.q||it.q===0)?it.q:'';
+    if(it.q===0||it.q==='')row.querySelector('.exq').value=it.q===0?'':it.q;
+    wrap.appendChild(row)})}
+function encNote(note,extra){if(extra&&extra.length)return JSON.stringify({t:note||'',x:extra});return note||''}
+function decNote(s){s=String(s||'');if(s.charAt(0)==='{'){try{var o=JSON.parse(s);if(o&&Object.prototype.hasOwnProperty.call(o,'t')&&Array.isArray(o.x))return {note:String(o.t||''),extra:o.x}}catch(e){}}return {note:s,extra:[]}}
 
 /* tabs */
 $('#tabs').addEventListener('click',function(e){var b=e.target.closest('button[data-tab]');if(!b)return;switchTab(b.dataset.tab)});
@@ -257,30 +268,34 @@ function switchTab(t){view=t;[].forEach.call($('#tabs').children,function(x){x.c
 /* entry */
 $('#saveBtn').addEventListener('click',saveEntry);
 $('#cancelEdit').addEventListener('click',resetForm);
+$('#addExtraBtn').addEventListener('click',function(){extraItems.push({n:'',q:''});renderExtras();var ins=$('#extraRows').querySelectorAll('.exn');if(ins.length)ins[ins.length-1].focus()});
+$('#extraRows').addEventListener('input',function(e){var t=e.target;if(t.classList.contains('exn')){if(extraItems[+t.dataset.i])extraItems[+t.dataset.i].n=t.value}else if(t.classList.contains('exq')){if(extraItems[+t.dataset.i])extraItems[+t.dataset.i].q=num(t.value)}});
+$('#extraRows').addEventListener('click',function(e){var b=e.target.closest('.exdel');if(!b)return;extraItems.splice(+b.dataset.i,1);renderExtras()});
 function resetForm(){editingId=null;$('#entryTitle').textContent='บันทึกการเบิกของ';$('#saveBtn').textContent='💾 บันทึกการเบิก';$('#cancelEdit').hidden=true;
-  setDateDropdowns(todayISO());$('#f_place').value='';$('#f_donors').value='';$('#f_note').value='';CATS.forEach(function(c){document.getElementById('q_'+c.key).value=0});liveTotal()}
+  setDateDropdowns(todayISO());$('#f_place').value='';$('#f_donors').value='';$('#f_note').value='';CATS.forEach(function(c){document.getElementById('q_'+c.key).value=0});liveTotal();extraItems=[];renderExtras()}
 function fillForm(r){editingId=r.id;$('#entryTitle').textContent='แก้ไขการเบิก';$('#saveBtn').textContent='💾 บันทึกการแก้ไข';$('#cancelEdit').hidden=false;
   setDateDropdowns(r.date||todayISO());$('#f_place').value=r.place||'';$('#f_donors').value=r.donors!=null?r.donors:'';$('#f_note').value=r.note||'';
-  CATS.forEach(function(c){document.getElementById('q_'+c.key).value=num(r[c.key])});liveTotal();switchTab('entry');window.scrollTo({top:0,behavior:'smooth'})}
+  CATS.forEach(function(c){document.getElementById('q_'+c.key).value=num(r[c.key])});extraItems=(r.extra||[]).map(function(x){return {n:x.n,q:x.q}});renderExtras();liveTotal();switchTab('entry');window.scrollTo({top:0,behavior:'smooth'})}
 function saveEntry(){var place=$('#f_place').value.trim();if(!place){toast('กรุณากรอกหน่วย/สถานที่');$('#f_place').focus();return}
   var data={date:getDateISO(),place:place,donors:num($('#f_donors').value),note:$('#f_note').value.trim()};
   CATS.forEach(function(c){data[c.key]=num(document.getElementById('q_'+c.key).value)});
+  data.extra=extraItems.filter(function(x){return (x.n||'').trim()}).map(function(x){return {n:(x.n||'').trim(),q:num(x.q)}});
   var saved,wasNew=!editingId;
   if(editingId){var r=records.find(function(x){return x.id===editingId});if(r){for(var k in data)r[k]=data[k];r.updatedAt=new Date().toISOString();saved=r}}
   else{data.id=uid();data.createdAt=new Date().toISOString();records.push(data);saved=data}
   sortRecords();saveRecords();
-  if(saved)pushServer({action:'save',record:{id:saved.id,date:saved.date,place:saved.place,donors:num(saved.donors),water:num(saved.water),snack:num(saved.snack),rice:num(saved.rice),note:saved.note||'',createdAt:saved.createdAt||''}});
+  if(saved)pushServer({action:'save',record:{id:saved.id,date:saved.date,place:saved.place,donors:num(saved.donors),water:num(saved.water),snack:num(saved.snack),rice:num(saved.rice),note:encNote(saved.note,saved.extra),createdAt:saved.createdAt||''}});
   toast(wasNew?'บันทึกเรียบร้อย ✓':'แก้ไขเรียบร้อย ✓');resetForm();switchTab('history')}
 function refreshPlaces(){var all=((SERVER_UNITS&&SERVER_UNITS.length)?SERVER_UNITS:UNITS).slice();records.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});memoRows.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});
   ['placelist','unitlist'].forEach(function(id){var dl=document.getElementById(id);if(!dl)return;dl.innerHTML='';all.forEach(function(nm){var o=document.createElement('option');o.value=nm;dl.appendChild(o)})})}
 
 /* LINE */
-function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+p[0])+543)%100;return '✅หน่วยรับบริจาคโลหิต '+dd+'/'+mm+'/'+yy+'\n'+'ขนม '+num(r.snack)+' ชุด\n'+'น้ำหวาน '+num(r.water)+' ที่\n'+'ข้าว '+num(r.rice)+' ชุด\n'+'ขอบคุณค่ะ'}
+function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+p[0])+543)%100;var s='✅หน่วยรับบริจาคโลหิต '+dd+'/'+mm+'/'+yy+'\n'+'ขนม '+num(r.snack)+' ชุด\n'+'น้ำหวาน '+num(r.water)+' ที่\n'+'ข้าว '+num(r.rice)+' ชุด\n';(r.extra||[]).forEach(function(x){if(x.n)s+=x.n+' '+num(x.q)+'\n'});s+='ขอบคุณค่ะ';return s}
 
 /* history */
 function renderHistory(){var wrap=$('#histWrap');wrap.innerHTML='';refreshPlaces();
   if(!records.length){wrap.appendChild(emptyBox('🗂️','ยังไม่มีประวัติการเบิก','กดแท็บ “บันทึกเบิก” เพื่อเพิ่มรายการแรก'));return}
-  records.forEach(function(r){var rec=el('div','rec');var chips='';CATS.forEach(function(c){chips+='<span class="chip">'+c.icon+' '+c.name+' <b class="tnum">'+num(r[c.key])+'</b></span>'});
+  records.forEach(function(r){var rec=el('div','rec');var chips='';CATS.forEach(function(c){chips+='<span class="chip">'+c.icon+' '+c.name+' <b class="tnum">'+num(r[c.key])+'</b></span>'});(r.extra||[]).forEach(function(x){if(x.n)chips+='<span class="chip">📦 '+esc(x.n)+' <b class="tnum">'+num(x.q)+'</b></span>'});
     rec.innerHTML='<div class="date"><div class="d tnum">'+(String(r.date).split("-")[2]||"?")+'</div><div class="my">'+monthShort(r.date)+'</div></div>'+
       '<div class="body"><div class="place">📍 <span></span></div><div class="meta"></div><div class="chips">'+chips+'</div>'+
       '<div class="acts"><button class="iconbtn line" data-line="'+r.id+'">💬 คัดลอก LINE</button><button class="iconbtn" data-edit="'+r.id+'">✏️ แก้ไข</button><button class="iconbtn danger" data-del="'+r.id+'">🗑️ ลบ</button></div><div class="confirm-slot"></div></div>'+
@@ -371,7 +386,7 @@ function jsonp(url,cb){var s=document.createElement('script');var name='__cb'+Da
 function pullServer(){if(!API_URL)return;syncStatus('⏳ กำลังซิงค์กับ Google Sheet…');
   jsonp(API_URL,function(err,data){
     if(err||!data||!data.ok){syncStatus('⚠️ ยังไม่ได้ซิงค์ — ใช้ข้อมูลในเครื่องไปก่อน');return}
-    if(Array.isArray(data.records)){records=data.records.map(function(r){r.date=normDate(r.date);return r});sortRecords();saveRecords()}
+    if(Array.isArray(data.records)){records=data.records.map(function(r){r.date=normDate(r.date);var dn=decNote(r.note);r.note=dn.note;r.extra=dn.extra;return r});sortRecords();saveRecords()}
     if(Array.isArray(data.units)&&data.units.length)SERVER_UNITS=data.units;
     if(data.plan&&typeof data.plan==='object')ROSTER_PLAN=data.plan;
     try{localStorage.setItem('supplyServerCache',JSON.stringify({units:SERVER_UNITS,plan:ROSTER_PLAN}))}catch(e){}
