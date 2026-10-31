@@ -103,6 +103,10 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .memo th,.memo td{border:1px solid #000;padding:5px 6px;text-align:center;vertical-align:middle}
 .memo th{font-weight:700}
 .memo td.place{text-align:left;padding-left:9px;white-space:normal}
+.memo td input{border:0;background:transparent;width:100%;font:inherit;color:#000;text-align:center;padding:2px 3px;border-radius:0}
+.memo td.place input{text-align:left}
+.memo td input:focus-visible{outline:1px solid var(--acc);background:#fff7f8;border-radius:3px}
+.memo .rowdel{border:0;background:transparent;color:#c0392b;font-size:15px;cursor:pointer;line-height:1;padding:2px 4px}
 .memo .sign{margin-top:14px}
 .memo .sign .line1{text-indent:46px;margin-bottom:34px}
 .memo .sb{width:330px;margin-left:auto;text-align:center}
@@ -123,6 +127,8 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
   .memo{width:100%!important;padding:0!important;color:#000!important;font-size:15px}
   .memo .fin{border-bottom-color:transparent!important}
   .memo th,.memo td{border:1px solid #000!important}
+  .memo td input{border:0!important}
+  .noprint{display:none!important}
 }
 </style>
 </head>
@@ -167,7 +173,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
   <section id="view-summary" hidden>
     <div class="sec-h"><span class="dot"></span><h2>ใบสรุปงาน (บันทึกข้อความ)</h2></div>
     <div class="monthsel"><label for="sumMonth">เลือกเดือน</label><select id="sumMonth"></select></div>
-    <div class="toolrow"><button class="btn primary" id="printBtn">🖨️ ปริ้นต์เอกสาร</button><button class="btn" id="copyMemoBtn">📋 คัดลอกข้อความ</button></div>
+    <div class="toolrow"><button class="btn" id="addRowBtn">➕ เพิ่มแถว</button><button class="btn" id="pullBtn">↺ ดึงจากที่บันทึก</button><button class="btn primary" id="printBtn">🖨️ ปริ้นต์เอกสาร</button><button class="btn" id="copyMemoBtn">📋 คัดลอกข้อความ</button></div>
     <div id="memoHost"></div>
     <div class="hint" style="margin-top:10px">แตะที่ช่องในเอกสารเพื่อแก้ไขได้ · ระบบจำค่าให้อัตโนมัติ · กด “ปริ้นต์เอกสาร” เพื่อพิมพ์หรือบันทึกเป็น PDF</div>
   </section>
@@ -180,6 +186,8 @@ var MEMO_COLS=[{key:'water',h:'น้ำหวาน'},{key:'snack',h:'ขนม
 var TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 var TH_MFULL=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 var records=[],view='entry',editingId=null,confirmId=null,sumMonth='',memoBuilt=false;
+var memoRows=[],memoSaveT=null;
+var UNITS=['วิทยาลัยเทคนิคสุราษฎร์ธานี','บริษัทสิริสิน','บ้านรักสุขภาพ อ.เวียงสระ','บริษัทซีพี แรม','ห้างสรรพสินค้าเซ็นทรัล','ที่ว่าการอำเภอท่าฉาง','ที่ว่าการอำเภอบ้านตาขุน','ค่ายวิภาวดีรังสิต (นศท.)','ศาลจังหวัดเวียงสระ','ที่ว่าการอำเภอชัยบุรี','ที่ว่าการอำเภอเกาะพะงัน','สนง.ตำรวจภูธรจังหวัดสุราษฎร์ธานี','ศูนย์ฝึกอบรมตำรวจภาค ๘','บริษัททวนชัย','โรงแรมไดมอนด์','โรงแรมวังใต้','มอ.สุราษฎร์ธานี','ที่ว่าการอำเภอวิภาวดี','ห้างสหไทย','เมกาโฮม','ศาลเวียงสระ'];
 var cfg={docNo:'สฎ ๐๐๓๓.๑๐๕.๑๖/',org:'โรงพยาบาลสุราษฎร์ธานี กลุ่มงานเทคนิคการแพทย์ งานธนาคารเลือด โทร.๗๓๐๒',subject:'ขอส่งยอดผู้บริจาคโลหิตนอกสถานที่',to:'หัวหน้าฝ่ายโภชนศาสตร์',signer:'นางสาวบูชิตา สวัสดิ์วรรณ',position:'นักเทคนิคการแพทย์ ชำนาญการ',docDate:''};
 
 function $(s){return document.querySelector(s)}
@@ -256,7 +264,8 @@ function saveEntry(){var place=$('#f_place').value.trim();if(!place){toast('ก�
   if(editingId){var r=records.find(function(x){return x.id===editingId});if(r){for(var k in data)r[k]=data[k];r.editedAt=new Date().toISOString()}}
   else{data.id=uid();data.createdAt=new Date().toISOString();records.push(data)}
   sortRecords();saveRecords();toast(editingId?'แก้ไขเรียบร้อย ✓':'บันทึกเรียบร้อย ✓');resetForm();switchTab('history')}
-function refreshPlaces(){var seen={},dl=$('#placelist');dl.innerHTML='';records.forEach(function(r){if(r.place&&!seen[r.place]){seen[r.place]=1;var o=document.createElement('option');o.value=r.place;dl.appendChild(o)}})}
+function refreshPlaces(){var all=UNITS.slice();records.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});memoRows.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});
+  ['placelist','unitlist'].forEach(function(id){var dl=document.getElementById(id);if(!dl)return;dl.innerHTML='';all.forEach(function(nm){var o=document.createElement('option');o.value=nm;dl.appendChild(o)})})}
 
 /* LINE */
 function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+p[0])+543)%100;return '✅หน่วยรับบริจาคโลหิต '+dd+'/'+mm+'/'+yy+'\n'+'ขนม '+num(r.snack)+' ชุด\n'+'น้ำหวาน '+num(r.water)+' ที่\n'+'ข้าว '+num(r.rice)+' ชุด\n'+'ขอบคุณค่ะ'}
@@ -288,8 +297,7 @@ function buildMonthOptions(){var sel=$('#sumMonth'),cur=sumMonth;sel.innerHTML='
 $('#sumMonth').addEventListener('change',function(){sumMonth=this.value;renderSummary()});
 function filteredRecords(){var rs=records.slice();if(sumMonth&&sumMonth!=='all')rs=rs.filter(function(r){return monthKey(r.date)===sumMonth});
   rs.sort(function(a,b){return String(a.date).localeCompare(String(b.date))||String(a.createdAt).localeCompare(String(b.createdAt))});return rs}
-function renderSummary(){if(!records.length){$('#memoHost').innerHTML='';$('#memoHost').appendChild(emptyBox('📄','ยังไม่มีข้อมูลสรุป','เพิ่มการเบิกก่อน แล้วใบสรุปจะสร้างให้อัตโนมัติ'));memoBuilt=false;return}
-  buildMonthOptions();buildMemo();updateMemo(filteredRecords())}
+function renderSummary(){buildMonthOptions();buildMemo();loadMemoRows();refreshPlaces();renderMemoRows();updateMemoBody()}
 function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_COLS.map(function(c){return '<th>'+c.h+'</th>'}).join('');
   host.innerHTML='<div class="memoscroll"><div class="memo" id="memoPage">'+
     '<img class="garuda" src="garuda.png" alt="ตราครุฑ"><div class="mt">บันทึกข้อความ</div>'+
@@ -298,7 +306,8 @@ function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_C
     '<div class="frow"><span class="lab">เรื่อง</span><input class="fin" id="m_subject" style="flex:1"></div>'+
     '<div class="frow"><span class="lab">เรียน</span><input class="fin" id="m_to" style="flex:1"></div>'+
     '<div class="mbody" id="m_body"></div>'+
-    '<table><thead><tr><th style="width:150px">ว.ด.ป.</th><th>สถานที่</th>'+cols+'<th style="width:78px">ผู้บริจาค<br>(รับจริง)</th></tr></thead><tbody id="m_rows"></tbody></table>'+
+    '<datalist id="unitlist"></datalist>'+
+    '<table><thead><tr><th style="width:128px">ว.ด.ป.</th><th>สถานที่</th><th style="width:60px">น้ำหวาน</th><th style="width:48px">ขนม</th><th style="width:48px">ข้าว</th><th style="width:64px">ผู้บริจาค<br>(รับจริง)</th><th class="noprint" style="width:30px"></th></tr></thead><tbody id="m_rows"></tbody></table>'+
     '<div class="sign"><div class="line1">จึงเรียนมาเพื่อโปรดพิจารณา</div><div class="sb"><div>(&nbsp;<input class="fin" id="m_signer" style="text-align:center;width:230px">&nbsp;)</div><div><input class="fin" id="m_position" style="text-align:center;width:260px"></div></div></div>'+
     '</div></div>';
   memoBuilt=true;
@@ -306,21 +315,36 @@ function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_C
   $('#m_docno').value=cfg.docNo||'';$('#m_docdate').value=cfg.docDate||thDateFull(todayISO());
   $('#m_signer').value=cfg.signer||'';$('#m_position').value=cfg.position||'';
   [['m_org','org'],['m_subject','subject'],['m_to','to'],['m_docno','docNo'],['m_docdate','docDate'],['m_signer','signer'],['m_position','position']].forEach(function(p){
-    document.getElementById(p[0]).addEventListener('input',function(){cfg[p[1]]=this.value;saveCfg()})})}
-function updateMemo(rs){if(!memoBuilt)return;
-  $('#m_body').textContent='ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน '+monthLabelTH(sumMonth)+' ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้';
-  var tb=$('#m_rows');tb.innerHTML='';
-  rs.forEach(function(r){var tr=document.createElement('tr');var tds='<td>'+thDateTbl(r.date)+'</td><td class="place"></td>';
-    MEMO_COLS.forEach(function(c){tds+='<td>'+(num(r[c.key])?thNum(num(r[c.key])):'-')+'</td>'});tds+='<td>'+(num(r.donors)?thNum(num(r.donors)):'-')+'</td>';
-    tr.innerHTML=tds;tr.querySelector('.place').textContent=r.place||'';tb.appendChild(tr)})}
+    document.getElementById(p[0]).addEventListener('input',function(){cfg[p[1]]=this.value;saveCfg()})});
+  $('#m_rows').addEventListener('input',function(e){var inp=e.target.closest('input[data-f]');if(!inp)return;var i=+inp.dataset.i,f=inp.dataset.f;if(!memoRows[i])return;memoRows[i][f]=(f==='d'||f==='place')?inp.value:(inp.value===''?'':num(inp.value));memoRowsDirtySave()});
+  $('#m_rows').addEventListener('click',function(e){var b=e.target.closest('button[data-del]');if(!b)return;memoRows.splice(+b.dataset.del,1);saveMemoRows();renderMemoRows()});
+}
+function updateMemoBody(){if(!memoBuilt)return;$('#m_body').textContent='ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน '+monthLabelTH(sumMonth)+' ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้'}
+function memoKey(){return 'supplyMemoRows_'+(sumMonth||'all')}
+function rowsFromRecords(){return filteredRecords().map(function(r){return {d:thDateTbl(r.date),place:r.place||'',water:num(r.water),snack:num(r.snack),rice:num(r.rice),donors:num(r.donors)}})}
+function loadMemoRows(){var saved=null;try{saved=JSON.parse(localStorage.getItem(memoKey())||'null')}catch(e){}memoRows=(saved&&saved.length!=null)?saved:rowsFromRecords()}
+function saveMemoRows(){try{localStorage.setItem(memoKey(),JSON.stringify(memoRows))}catch(e){}}
+function memoRowsDirtySave(){clearTimeout(memoSaveT);memoSaveT=setTimeout(saveMemoRows,500)}
+function renderMemoRows(){var tb=$('#m_rows');if(!tb)return;tb.innerHTML='';
+  memoRows.forEach(function(row,i){var tr=document.createElement('tr');
+    tr.innerHTML='<td><input data-f="d" data-i="'+i+'"></td><td class="place"><input data-f="place" data-i="'+i+'" list="unitlist"></td>'+
+      '<td><input data-f="water" data-i="'+i+'" inputmode="numeric"></td><td><input data-f="snack" data-i="'+i+'" inputmode="numeric"></td>'+
+      '<td><input data-f="rice" data-i="'+i+'" inputmode="numeric"></td><td><input data-f="donors" data-i="'+i+'" inputmode="numeric"></td>'+
+      '<td class="noprint"><button class="rowdel" data-del="'+i+'" title="ลบแถว" type="button">✕</button></td>';
+    tr.querySelector('[data-f="d"]').value=row.d||'';tr.querySelector('[data-f="place"]').value=row.place||'';
+    tr.querySelector('[data-f="water"]').value=row.water||'';tr.querySelector('[data-f="snack"]').value=row.snack||'';
+    tr.querySelector('[data-f="rice"]').value=row.rice||'';tr.querySelector('[data-f="donors"]').value=row.donors||'';
+    tb.appendChild(tr)})}
 function garudaSVG(){return '<svg viewBox="0 0 64 64" width="64" height="64" aria-label="ตราครุฑ"><circle cx="32" cy="32" r="30" fill="none" stroke="#000" stroke-width="1.4" stroke-dasharray="2 2"/><text x="32" y="30" text-anchor="middle" font-size="9" fill="#555">ตรา</text><text x="32" y="42" text-anchor="middle" font-size="9" fill="#555">ครุฑ</text></svg>'}
 
 /* print + copy */
-$('#printBtn').addEventListener('click',function(){if(!records.length){toast('ยังไม่มีข้อมูล');return}window.print()});
-$('#copyMemoBtn').addEventListener('click',function(){if(!records.length){toast('ยังไม่มีข้อมูล');return}var rs=filteredRecords();
+$('#printBtn').addEventListener('click',function(){window.print()});
+$('#addRowBtn').addEventListener('click',function(){memoRows.push({d:'',place:'',water:'',snack:'',rice:'',donors:''});saveMemoRows();renderMemoRows();var inps=$('#m_rows').querySelectorAll('tr:last-child input');if(inps[0])inps[0].focus()});
+$('#pullBtn').addEventListener('click',function(){if(memoRows.length&&!window.confirm('ดึงข้อมูลจากรายการที่บันทึกไว้ จะเขียนทับสิ่งที่พิมพ์แก้ในตารางนี้ ดำเนินการไหม?'))return;memoRows=rowsFromRecords();saveMemoRows();renderMemoRows();toast('ดึงข้อมูลจากที่บันทึกแล้ว ✓')});
+$('#copyMemoBtn').addEventListener('click',function(){
   var lines=['บันทึกข้อความ','ส่วนราชการ '+(cfg.org||''),'ที่ '+(cfg.docNo||''),'วันที่ '+($('#m_docdate')?$('#m_docdate').value:(cfg.docDate||'')),'เรื่อง '+(cfg.subject||''),'เรียน '+(cfg.to||''),'',
     'ยอดเบิกของเลี้ยงผู้บริจาคโลหิต เดือน '+monthLabel(sumMonth),'',['ว.ด.ป.','สถานที่','น้ำหวาน','ขนม','ข้าว','ผู้บริจาค'].join('\t')];
-  rs.forEach(function(r){lines.push([thDate(r.date),r.place||'',num(r.water),num(r.snack),num(r.rice),num(r.donors)].join('\t'))});
+  memoRows.forEach(function(r){lines.push([r.d||'',r.place||'',r.water||'',r.snack||'',r.rice||'',r.donors||''].join('\t'))});
   lines.push('','จึงเรียนมาเพื่อโปรดพิจารณา','','('+(cfg.signer||'')+')',(cfg.position||''));copyText(lines.join('\n'),'คัดลอกข้อความใบสรุปแล้ว ✓')});
 
 function copyText(txt,ok){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast(ok)}).catch(function(){fb(txt,ok)})}else fb(txt,ok)}
