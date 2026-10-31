@@ -1,5 +1,5 @@
 /* Service worker สำหรับ "เบิกของออกหน่วย" (PWA) — cache app shell */
-const VERSION = 'v8';
+const VERSION = 'v9';
 const CACHE = 'supply-bb-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.json', './garuda.png', './cover.png'];
 

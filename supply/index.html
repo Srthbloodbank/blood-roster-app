@@ -74,7 +74,9 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .catrow.cat-rice{background:color-mix(in srgb,var(--rice) 13%,var(--card));border-color:color-mix(in srgb,var(--rice) 35%,var(--line))}
 .catrow.cat-rice .cic{background:color-mix(in srgb,var(--rice) 22%,var(--card))}
 .catrow.cat-rice .cn b{color:var(--rice)}
-.catrow .cic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;flex:none;background:var(--card);border:1px solid var(--line)}
+.catrow .cic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:27px;flex:none;background:var(--card);border:1px solid var(--line);animation:bop 3s ease-in-out infinite}
+.cat-water .cic{animation-delay:.5s}.cat-rice .cic{animation-delay:1s}
+@keyframes bop{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .catrow .cn{flex:1;min-width:0}.catrow .cn b{display:block;font-size:15px}.catrow .cn span{font-size:12.5px;color:var(--mute)}
 .stepper{display:flex;flex:none}
 .stepper button{width:40px;height:44px;border:1px solid var(--line);background:var(--card);font-size:22px;line-height:1;color:var(--acc);font-weight:700}
@@ -128,11 +130,13 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .memo .sign{margin-top:14px}
 .memo .sign .line1{text-indent:46px;margin-bottom:34px}
 .memo .sb{width:330px;margin-left:auto;text-align:center}
-.empty{text-align:center;padding:40px 18px;color:var(--mute)}.empty .big{font-size:40px}.empty h3{font-size:16px;color:var(--ink);margin:10px 0 4px}
+.empty{text-align:center;padding:40px 18px;color:var(--mute)}.empty .big{font-size:54px}.empty h3{font-size:16px;color:var(--ink);margin:10px 0 4px}
+.cutefoot{text-align:center;color:var(--mute);font-size:12.5px;padding:20px 0 6px;line-height:1.8}
+.cutefoot .em{font-size:17px;letter-spacing:4px}
 .banner{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:11px;background:var(--okbg);color:var(--ink);font-size:13px;font-weight:600;margin-bottom:14px}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0));transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.3);font-weight:600;font-size:14px;opacity:0;transition:.25s;z-index:50;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 /* ===== PRINT: เหลือเฉพาะเอกสาร พอดี A4 ===== */
 @media print{
@@ -197,6 +201,8 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
     <div id="memoHost"></div>
     <div class="hint" style="margin-top:10px">แตะที่ช่องในเอกสารเพื่อแก้ไขได้ · ระบบจำค่าให้อัตโนมัติ · กด “ปริ้นต์เอกสาร” เพื่อพิมพ์หรือบันทึกเป็น PDF</div>
   </section>
+
+  <div class="cutefoot"><div class="em">🍙 🥤 🍪 🩷</div>ทำด้วยใจ · ธนาคารเลือด รพ.สุราษฎร์ธานี</div>
 </main>
 <div class="toast" id="toast" role="status"></div>
 
