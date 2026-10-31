@@ -1,0 +1,18 @@
+{
+  "name": "เวรแพทย์ออกหน่วย - ธนาคารเลือด รพ.สุราษฎร์ธานี",
+  "short_name": "เวรออกหน่วย",
+  "description": "ตารางเวรแพทย์ออกหน่วยรับบริจาคโลหิต ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#14263a",
+  "theme_color": "#14263a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
