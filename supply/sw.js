@@ -1,5 +1,5 @@
 /* Service worker สำหรับ "เบิกของออกหน่วย" (PWA) — cache app shell */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = 'supply-bb-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.json', './garuda.png'];
 
@@ -33,9 +33,12 @@ self.addEventListener('fetch', function (e) {
     }));
     return;
   }
-  e.respondWith(caches.match(req).then(function (cached) {
-    return cached || fetch(req).then(function (res) {
-      var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); return res;
-    }).catch(function () { return cached; });
-  }));
+  if (/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) {
+    e.respondWith(caches.match(req).then(function (cached) {
+      return cached || fetch(req).then(function (res) {
+        var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); return res;
+      }).catch(function () { return cached; });
+    }));
+  }
+  // โฮสต์อื่น (เช่น Apps Script API) ไม่แคช ปล่อยผ่านเครือข่ายตรงๆ เสมอ
 });

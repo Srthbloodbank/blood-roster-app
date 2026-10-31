@@ -154,13 +154,14 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
         <div class="drow"><select id="d_day" aria-label="วัน"></select><select id="d_mon" aria-label="เดือน"></select><select id="d_year" aria-label="ปี พ.ศ."></select></div>
       </div>
       <div class="field"><label for="f_place">หน่วย / สถานที่</label>
-        <input type="text" id="f_place" list="placelist" placeholder="เช่น ห้างสหไทย, ศาลเวียงสระ" autocomplete="off"><datalist id="placelist"></datalist></div>
+        <input type="text" id="f_place" list="placelist" placeholder="เช่น ห้างสหไทย, ศาลเวียงสระ" autocomplete="off"><datalist id="placelist"></datalist><div class="hint" id="planHint" style="margin-top:3px"></div></div>
       <div class="field"><label for="f_donors">จำนวนผู้บริจาค — รับจริง (คน)</label><input type="number" id="f_donors" min="0" inputmode="numeric" placeholder="0"></div>
       <div class="field" style="margin-bottom:8px"><label>จำนวนของที่เบิก</label></div>
       <div id="catRows"></div>
       <div class="totalbar"><b>รวมของทั้งหมด</b><span class="n tnum" id="liveTotal">0</span></div>
       <div class="field" style="margin-top:14px"><label for="f_note">หมายเหตุ (ถ้ามี)</label><textarea id="f_note" rows="2" placeholder="เช่น ของเหลือ, ฝากคนอื่นไปส่ง"></textarea></div>
       <div class="rowbtns"><button class="btn primary block" id="saveBtn">💾 บันทึกการเบิก</button><button class="btn ghost" id="cancelEdit" hidden>ยกเลิก</button></div>
+      <div class="hint" id="syncLine" style="margin-top:10px"></div>
     </div>
   </section>
 
@@ -187,6 +188,8 @@ var TH_MFULL=['มกราคม','กุมภาพันธ์','มีน�
 var records=[],view='entry',editingId=null,confirmId=null,sumMonth='',memoBuilt=false;
 var memoRows=[],memoSaveT=null;
 var UNITS=['ค่ายวิภาวดีรังสิต','ธนาคารเลือด รพ.สุราษฎร์ธานี','มหาวิทยาลัยราชภัฏสุราษฎร์ธานี','กองบิน 7','ค่ายวิภาวดีรังสิต(นักศึกษาวิชาทหาร)','อำเภอกาญจนดิษฐ์','อำเภอคีรีรัฐนิคม','อำเภอเคียนซา','อำเภอชัยบุรี','อำเภอไชยา','อำเภอดอนสัก','อำเภอท่าฉาง','อำเภอท่าชนะ','อำเภอบ้านตาขุน','อำเภอบ้านนาสาร','อำเภอพนม','อำเภอพุนพิน','อำเภอวิภาวดี','บริษัทซีพีแรม','บริษัทโตโยต้า ตาปี','บริษัททรงพรเจริญการเกษตรและจักรกล','บริษัทบ้านดอนปิยะกลการ จำกัด(Honda BigWing)','บริษัทประดิษฐ์พงศ์มอเตอร์','บริษัทเพชรศรีวิชัย จำกัด','บริษัทศรีตรังโกลฟส์(ประเทศไทย) จำกัด สาขาสุราษฎร์','บริษัทศรีสุบรรณฟาร์ม4','บริษัทศุภกิตต์มอเตอร์','บริษัทสิริสินอำเภอเวียงสระ','บ้านรักสุขภาพ อ.เวียงสระ','มหาวิทยาลัยสงขลานครินทร์วิทยาเขตสุราษฎร์ธานี','เรือนจำกลางสุราษฎร์ธานี','รพ.กรุงเทพสุราษฎรธานี','รพสต.บ้านกงตาก','ร.ร.เทพมิตรศึกษา','ร.ร.บางสวรรค์','ร.ร.บ้านนาวิทยาคม+อ.บ้านนาเดิม','ร.ร.พระแสงวิทยา(อ.พระแสง)','ร.ร.เมืองสุราษฎร์ธานี','ร.ร.สุราษฎร์ธานี','รร.ไดมอนด์ พลาซ่า(คุมประพฤติ)','วิทยาลัยอาชีวศึกษาสุราษฎร์ธานี','ศาลจังหวัดเวียงสระ','ศูนย์ฝึกอบรมตำรวจภูธรภาค 8','รพสต.เฉลิมพระเกียรติควนยูง ต.ขุนทะเล','สำนักงานตำรวจภูธรจังหวัดสุราษฎร์ธานี','ห้างบิ๊กซีสาขาสุราษฎร์ธานี','ห้างเซ็นทรัลพลาซ่า','ห้างสหไทย(อ.เมืองสุราษฎร์ธานี)','บริษัทสิริสินสุราษฎร์ธานี','บริษัทโฮมโปรดักเซ็นเตอร์ จำกัด (มหาชน)','ร.ร.ราชประชานุเคราะห์','รร.สุราษฎร์ธานี2','ศูนย์บริการโลหิตแห่งชาติ','ภาคบริการโลหิตที่ 11','รพ.กาญจนดิษฐ์','เขื่อนรัชชประภา','รพ.สวนสราญรมณ์','วิทยาลัยการอาชีพไชยา','ห้างค้าแม็คโคร','รพ.มะเร็ง สุราษฎร์ธานี','รพ.เกาะสมุย','รร.วังใต้','วิทยาลัยเทคนิคสุราษฎร์ธานี','ศูนย์การค้าโคลีเซี่ยมสุราษฎร์ธานี','รพ.หาดใหญ่','รพ.สต.คลองสระ','ศาลเยาวชน','สนง.เทศบาลนครสุราษฎร์ธานี','วิทยาลัยพยาบาล','เมกาโฮม เวียงสระ','ศาลากลางจังหวัด สฎ','บริษัทวนชัย','ร.ร.ธิดาแม่พระ','บริษัทหาดทิพย์','อำเภอพระแสง','ที่ว่าการอำเภอเกาะพะงัน','ที่ว่าการอำเภอบ้านนาเดิม'];
+var API_URL='https://script.google.com/macros/s/AKfycbwXQwtsvzSLJ_-uGmRW51-yVTeDVYBaI8LXKjZVCTqT5oCDFlEjWV4SJTyj5vu8VByu/exec';
+var ROSTER_PLAN={},SERVER_UNITS=null;
 var cfg={docNo:'สฎ ๐๐๓๓.๑๐๕.๑๖/',org:'โรงพยาบาลสุราษฎร์ธานี กลุ่มงานเทคนิคการแพทย์ งานธนาคารเลือด โทร.๗๓๐๒',subject:'ขอส่งยอดผู้บริจาคโลหิตนอกสถานที่',to:'หัวหน้าฝ่ายโภชนศาสตร์',signer:'นางสาวบูชิตา สวัสดิ์วรรณ',position:'นักเทคนิคการแพทย์ ชำนาญการ',docDate:''};
 
 function $(s){return document.querySelector(s)}
@@ -208,12 +211,12 @@ function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clea
 /* storage */
 function loadAll(){try{records=JSON.parse(localStorage.getItem('supplyRecords')||'[]')||[]}catch(e){records=[]}
   try{var c=JSON.parse(localStorage.getItem('supplyCfg')||'null');if(c)for(var k in c)if(c[k]!=null&&c[k]!=='')cfg[k]=c[k]}catch(e){}
-  if(!records.length&&!localStorage.getItem('supplySeeded')){records=seedData();saveRecords();try{localStorage.setItem('supplySeeded','1')}catch(e){}}
+  if(!API_URL&&!records.length&&!localStorage.getItem('supplySeeded')){records=seedData();saveRecords();try{localStorage.setItem('supplySeeded','1')}catch(e){}}
   sortRecords();
 }
 function saveRecords(){try{localStorage.setItem('supplyRecords',JSON.stringify(records))}catch(e){toast('บันทึกลงเครื่องไม่ได้ (พื้นที่เต็ม?)')}}
 function saveCfg(){try{localStorage.setItem('supplyCfg',JSON.stringify(cfg))}catch(e){}}
-function sortRecords(){records.sort(function(a,b){return String(b.createdAt||b.date).localeCompare(String(a.createdAt||a.date))})}
+function sortRecords(){records.sort(function(a,b){return String(b.date).localeCompare(String(a.date))||String(b.createdAt||'').localeCompare(String(a.createdAt||''))})}
 function seedData(){return [
   {id:uid(),date:'2026-10-28',place:'เมกาโฮม',donors:0,water:50,snack:80,rice:20,note:'ย้ายมาจากชีทเดิม',createdAt:'2026-10-28T20:42:40'},
   {id:uid(),date:'2026-10-30',place:'ศาลเวียงสระ',donors:0,water:50,snack:50,rice:16,note:'ย้ายมาจากชีทเดิม',createdAt:'2026-10-29T13:22:51'},
@@ -230,6 +233,8 @@ $('#themeBtn').addEventListener('click',function(){var c=document.documentElemen
   TH_MFULL.forEach(function(nm,i){var o=document.createElement('option');o.value=i+1;o.textContent=nm;mm.appendChild(o)});
   var cy=new Date().getFullYear()+543;for(var y=cy+1;y>=cy-2;y--){var o2=document.createElement('option');o2.value=y;o2.textContent='พ.ศ. '+y;yy.appendChild(o2)}
   setDateDropdowns(todayISO());})();
+['d_day','d_mon','d_year'].forEach(function(id){document.getElementById(id).addEventListener('change',onDateChange)});
+function onDateChange(){if(editingId)return;var iso=getDateISO();var p=ROSTER_PLAN[iso];var h=$('#planHint');if(p){$('#f_place').value=p;if(h)h.textContent='📅 ตามแผนเวรแพทย์: '+p}else{if(h)h.textContent=''}}
 function setDateDropdowns(iso){var p=String(iso).split('-');$('#d_day').value=+p[2];$('#d_mon').value=+p[1];$('#d_year').value=(+p[0])+543}
 function getDateISO(){var d=+$('#d_day').value,m=+$('#d_mon').value,y=(+$('#d_year').value)-543;return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
 
@@ -260,10 +265,13 @@ function fillForm(r){editingId=r.id;$('#entryTitle').textContent='แก้ไ�
 function saveEntry(){var place=$('#f_place').value.trim();if(!place){toast('กรุณากรอกหน่วย/สถานที่');$('#f_place').focus();return}
   var data={date:getDateISO(),place:place,donors:num($('#f_donors').value),note:$('#f_note').value.trim()};
   CATS.forEach(function(c){data[c.key]=num(document.getElementById('q_'+c.key).value)});
-  if(editingId){var r=records.find(function(x){return x.id===editingId});if(r){for(var k in data)r[k]=data[k];r.editedAt=new Date().toISOString()}}
-  else{data.id=uid();data.createdAt=new Date().toISOString();records.push(data)}
-  sortRecords();saveRecords();toast(editingId?'แก้ไขเรียบร้อย ✓':'บันทึกเรียบร้อย ✓');resetForm();switchTab('history')}
-function refreshPlaces(){var all=UNITS.slice();records.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});memoRows.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});
+  var saved,wasNew=!editingId;
+  if(editingId){var r=records.find(function(x){return x.id===editingId});if(r){for(var k in data)r[k]=data[k];r.updatedAt=new Date().toISOString();saved=r}}
+  else{data.id=uid();data.createdAt=new Date().toISOString();records.push(data);saved=data}
+  sortRecords();saveRecords();
+  if(saved)pushServer({action:'save',record:{id:saved.id,date:saved.date,place:saved.place,donors:num(saved.donors),water:num(saved.water),snack:num(saved.snack),rice:num(saved.rice),note:saved.note||'',createdAt:saved.createdAt||''}});
+  toast(wasNew?'บันทึกเรียบร้อย ✓':'แก้ไขเรียบร้อย ✓');resetForm();switchTab('history')}
+function refreshPlaces(){var all=((SERVER_UNITS&&SERVER_UNITS.length)?SERVER_UNITS:UNITS).slice();records.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});memoRows.forEach(function(r){if(r.place&&all.indexOf(r.place)<0)all.push(r.place)});
   ['placelist','unitlist'].forEach(function(id){var dl=document.getElementById(id);if(!dl)return;dl.innerHTML='';all.forEach(function(nm){var o=document.createElement('option');o.value=nm;dl.appendChild(o)})})}
 
 /* LINE */
@@ -286,7 +294,7 @@ $('#histWrap').addEventListener('click',function(e){var ln=e.target.closest('but
   if(dl){confirmId=dl.dataset.del;renderHistory();return}});
 function confirmBox(id){var box=el('div','confirm');box.innerHTML='<span>ลบรายการนี้?</span>';var y=el('button','yes','ลบ'),n=el('button','no','ยกเลิก');
   y.onclick=function(){doDelete(id)};n.onclick=function(){confirmId=null;renderHistory()};box.appendChild(y);box.appendChild(n);return box}
-function doDelete(id){confirmId=null;records=records.filter(function(x){return x.id!==id});saveRecords();toast('ลบแล้ว');renderHistory()}
+function doDelete(id){confirmId=null;records=records.filter(function(x){return x.id!==id});saveRecords();pushServer({action:'delete',id:id});toast('ลบแล้ว');renderHistory()}
 
 /* summary + memo */
 function buildMonthOptions(){var sel=$('#sumMonth'),cur=sumMonth;sel.innerHTML='';var mks={};records.forEach(function(r){var mk=monthKey(r.date);if(mk)mks[mk]=1});
@@ -350,8 +358,34 @@ function copyText(txt,ok){if(navigator.clipboard&&navigator.clipboard.writeText)
 function fb(txt,ok){try{var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast(ok)}catch(e){toast('คัดลอกไม่สำเร็จ')}}
 function emptyBox(b,h,s){var d=el('div','empty');d.innerHTML='<div class="big">'+b+'</div><h3></h3><div></div>';d.querySelector('h3').textContent=h;d.querySelector('div:last-child').textContent=s;return d}
 
+/* ---- Google Sheet sync ---- */
+function renderCurrent(){if(view==='history')renderHistory();else if(view==='summary')renderSummary()}
+function syncStatus(m){var e=$('#syncLine');if(e)e.textContent=m}
+function normDate(v){v=String(v||'');var m=v.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];var d=new Date(v);if(!isNaN(d))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');return v}
+function jsonp(url,cb){var s=document.createElement('script');var name='__cb'+Date.now()+Math.floor(Math.random()*1e4);var done=false;
+  window[name]=function(data){done=true;cleanup();cb(null,data)};
+  function cleanup(){try{delete window[name]}catch(e){window[name]=undefined}if(s.parentNode)s.parentNode.removeChild(s)}
+  s.onerror=function(){if(done)return;cleanup();cb(new Error('net'))};
+  s.src=url+(url.indexOf('?')>=0?'&':'?')+'callback='+name;document.head.appendChild(s);
+  setTimeout(function(){if(done)return;cleanup();cb(new Error('timeout'))},15000)}
+function pullServer(){if(!API_URL)return;syncStatus('⏳ กำลังซิงค์กับ Google Sheet…');
+  jsonp(API_URL,function(err,data){
+    if(err||!data||!data.ok){syncStatus('⚠️ ยังไม่ได้ซิงค์ — ใช้ข้อมูลในเครื่องไปก่อน');return}
+    if(Array.isArray(data.records)){records=data.records.map(function(r){r.date=normDate(r.date);return r});sortRecords();saveRecords()}
+    if(Array.isArray(data.units)&&data.units.length)SERVER_UNITS=data.units;
+    if(data.plan&&typeof data.plan==='object')ROSTER_PLAN=data.plan;
+    try{localStorage.setItem('supplyServerCache',JSON.stringify({units:SERVER_UNITS,plan:ROSTER_PLAN}))}catch(e){}
+    refreshPlaces();renderCurrent();onDateChange();syncStatus('✅ ซิงค์กับ Google Sheet แล้ว ('+records.length+' รายการ)')})}
+function pushServer(payload,cb){if(!API_URL){cb&&cb(new Error('no api'));return}
+  syncStatus('⏳ กำลังบันทึกลง Google Sheet…');
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow'})
+    .then(function(r){return r.text().catch(function(){return ''})}).then(function(){syncStatus('✅ บันทึกลง Google Sheet แล้ว');cb&&cb(null)})
+    .catch(function(e){syncStatus('⚠️ บันทึกในเครื่องแล้ว · ยังไม่ซิงค์ชีต (จะลองใหม่เมื่อรีเฟรช)');cb&&cb(e)})}
+
 /* boot */
-loadAll();refreshPlaces();
+loadAll();
+try{var sc=JSON.parse(localStorage.getItem('supplyServerCache')||'null');if(sc){if(sc.units)SERVER_UNITS=sc.units;if(sc.plan)ROSTER_PLAN=sc.plan}}catch(e){}
+refreshPlaces();onDateChange();pullServer();
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
 </script>
 </body>
