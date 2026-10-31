@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [claude/app-beik-khong-v699cy]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
