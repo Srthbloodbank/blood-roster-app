@@ -1,5 +1,5 @@
 /* Service worker สำหรับ "เบิกของออกหน่วย" (PWA) — cache app shell */
-const VERSION = 'v7';
+const VERSION = 'v8';
 const CACHE = 'supply-bb-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.json', './garuda.png', './cover.png'];
 
@@ -18,12 +18,22 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
   if (req.mode === 'navigate') {
-    // แสดงจากแคชทันที (เร็ว) แล้วอัปเดตเบื้องหลังสำหรับครั้งถัดไป
-    e.respondWith(caches.match('./index.html').then(function (cached) {
-      var net = fetch(req).then(function (res) {
-        var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put('./index.html', copy); }); return res;
-      }).catch(function () { return cached; });
-      return cached || net;
+    // เรียกเน็ตก่อน (ได้ของใหม่) แต่ถ้าช้าเกิน 2.5 วิ ใช้แคชทันที (ไม่ค้าง)
+    e.respondWith(new Promise(function (resolve) {
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return; settled = true;
+        caches.match('./index.html').then(function (c) { resolve(c || fetch(req)); });
+      }, 2500);
+      fetch(req).then(function (res) {
+        if (settled) { var c2 = res.clone(); caches.open(CACHE).then(function (c) { c.put('./index.html', c2); }); return; }
+        settled = true; clearTimeout(timer);
+        var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put('./index.html', copy); });
+        resolve(res);
+      }).catch(function () {
+        if (settled) return; settled = true; clearTimeout(timer);
+        caches.match('./index.html').then(function (c) { resolve(c || caches.match('./')); });
+      });
     }));
     return;
   }

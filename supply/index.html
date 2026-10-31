@@ -6,7 +6,7 @@
 <title>Supply BB</title>
 <meta name="description" content="บันทึกการเบิกของออกหน่วยรับบริจาคโลหิต ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี พร้อมใบสรุปงานพิมพ์ได้">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#06b6d4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#22c1dc" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e7490" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --brand-a:#06b6d4; --brand-b:#3b82f6;
+  --brand-a:#22c1dc; --brand-b:#f472b6;
   --navy:#0e7490; --navy2:#0b5566; --acc:#f43f5e; --accink:#fff;
   --bg:#f1f5f9; --card:#fff; --ink:#0f172a; --mute:#64748b; --line:#e2e8f0; --head:#f8fafc;
   --ok:#10b981; --okbg:#d1fae5; --warn:#f59e0b; --water:#0ea5e9; --snack:#f59e0b; --rice:#10b981;
@@ -26,9 +26,9 @@
   color-scheme:light; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --brand-a:#0e7490;--brand-b:#1e40af;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
+  --brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
 }}
-:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#1e40af;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
+:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 img{max-width:100%}
@@ -64,7 +64,16 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .field label{font-size:13px;font-weight:600;color:var(--mute);letter-spacing:.2px}
 .drow{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:8px}
-.catrow{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--bg);margin-bottom:10px}
+.catrow{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg);margin-bottom:10px}
+.catrow.cat-snack{background:color-mix(in srgb,var(--snack) 13%,var(--card));border-color:color-mix(in srgb,var(--snack) 35%,var(--line))}
+.catrow.cat-snack .cic{background:color-mix(in srgb,var(--snack) 22%,var(--card))}
+.catrow.cat-snack .cn b{color:var(--snack)}
+.catrow.cat-water{background:color-mix(in srgb,var(--water) 13%,var(--card));border-color:color-mix(in srgb,var(--water) 35%,var(--line))}
+.catrow.cat-water .cic{background:color-mix(in srgb,var(--water) 22%,var(--card))}
+.catrow.cat-water .cn b{color:var(--water)}
+.catrow.cat-rice{background:color-mix(in srgb,var(--rice) 13%,var(--card));border-color:color-mix(in srgb,var(--rice) 35%,var(--line))}
+.catrow.cat-rice .cic{background:color-mix(in srgb,var(--rice) 22%,var(--card))}
+.catrow.cat-rice .cn b{color:var(--rice)}
 .catrow .cic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;flex:none;background:var(--card);border:1px solid var(--line)}
 .catrow .cn{flex:1;min-width:0}.catrow .cn b{display:block;font-size:15px}.catrow .cn span{font-size:12.5px;color:var(--mute)}
 .stepper{display:flex;flex:none}
@@ -85,6 +94,9 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .rec .meta{font-size:12.5px;color:var(--mute);margin-top:2px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+.chip.chip-snack{background:color-mix(in srgb,var(--snack) 14%,var(--card));border-color:color-mix(in srgb,var(--snack) 35%,var(--line))}
+.chip.chip-water{background:color-mix(in srgb,var(--water) 14%,var(--card));border-color:color-mix(in srgb,var(--water) 35%,var(--line))}
+.chip.chip-rice{background:color-mix(in srgb,var(--rice) 14%,var(--card));border-color:color-mix(in srgb,var(--rice) 35%,var(--line))}
 .rec .tot{flex:none;text-align:right}.rec .tot .n{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}.rec .tot .l{font-size:11px;color:var(--mute)}
 .rec .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .iconbtn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;color:var(--mute);display:inline-flex;gap:5px;align-items:center}
@@ -248,7 +260,7 @@ function getDateISO(){var d=+$('#d_day').value,m=+$('#d_mon').value,y=(+$('#d_ye
 
 /* steppers */
 (function(){var wrap=$('#catRows');
-  CATS.forEach(function(c){var row=el('div','catrow');
+  CATS.forEach(function(c){var row=el('div','catrow cat-'+c.key);
     row.innerHTML='<div class="cic">'+c.icon+'</div><div class="cn"><b>'+c.name+'</b><span>หน่วย: '+c.unit+'</span></div>'+
       '<div class="stepper"><button type="button" data-step="-1" data-k="'+c.key+'" aria-label="ลด'+c.name+'">−</button><input type="number" id="q_'+c.key+'" min="0" value="0" inputmode="numeric" aria-label="จำนวน'+c.name+'"><button type="button" data-step="1" data-k="'+c.key+'" aria-label="เพิ่ม'+c.name+'">+</button></div>';
     wrap.appendChild(row)});
@@ -301,7 +313,7 @@ function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+
 /* history */
 function renderHistory(){var wrap=$('#histWrap');wrap.innerHTML='';refreshPlaces();
   if(!records.length){wrap.appendChild(emptyBox('🗂️','ยังไม่มีประวัติการเบิก','กดแท็บ “บันทึกเบิก” เพื่อเพิ่มรายการแรก'));return}
-  records.forEach(function(r){var rec=el('div','rec');var chips='';CATS.forEach(function(c){chips+='<span class="chip">'+c.icon+' '+c.name+' <b class="tnum">'+num(r[c.key])+'</b></span>'});(r.extra||[]).forEach(function(x){if(x.n)chips+='<span class="chip">📦 '+esc(x.n)+' <b class="tnum">'+num(x.q)+'</b></span>'});
+  records.forEach(function(r){var rec=el('div','rec');var chips='';CATS.forEach(function(c){chips+='<span class="chip chip-'+c.key+'">'+c.icon+' '+c.name+' <b class="tnum">'+num(r[c.key])+'</b></span>'});(r.extra||[]).forEach(function(x){if(x.n)chips+='<span class="chip">📦 '+esc(x.n)+' <b class="tnum">'+num(x.q)+'</b></span>'});
     rec.innerHTML='<div class="date"><div class="d tnum">'+(String(r.date).split("-")[2]||"?")+'</div><div class="my">'+monthShort(r.date)+'</div></div>'+
       '<div class="body"><div class="place">📍 <span></span></div><div class="meta"></div><div class="chips">'+chips+'</div>'+
       '<div class="acts"><button class="iconbtn line" data-line="'+r.id+'">💬 คัดลอก LINE</button><button class="iconbtn" data-edit="'+r.id+'">✏️ แก้ไข</button><button class="iconbtn danger" data-del="'+r.id+'">🗑️ ลบ</button></div><div class="confirm-slot"></div></div>'+
