@@ -6,7 +6,7 @@
 <title>Supply BB</title>
 <meta name="description" content="บันทึกการเบิกของออกหน่วยรับบริจาคโลหิต ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี พร้อมใบสรุปงานพิมพ์ได้">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#22c1dc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#67cfdf" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e7490" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,22 +18,23 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --brand-a:#22c1dc; --brand-b:#f472b6;
-  --navy:#0e7490; --navy2:#0b5566; --acc:#f43f5e; --accink:#fff;
-  --bg:#f1f5f9; --card:#fff; --ink:#0f172a; --mute:#64748b; --line:#e2e8f0; --head:#f8fafc;
-  --ok:#10b981; --okbg:#d1fae5; --warn:#f59e0b; --water:#0ea5e9; --snack:#f59e0b; --rice:#10b981;
+  --brand-a:#67cfdf; --brand-b:#f69ac7;
+  --navy:#0e7490; --navy2:#0b5566; --acc:#ef5a92; --accink:#fff;
+  --page-bg:linear-gradient(170deg,#e7f6f0 0%,#fdf4ec 45%,#fde8f0 100%);
+  --bg:#fbf3ee; --card:#ffffff; --ink:#3f4555; --mute:#8b90a3; --line:#efe1e9; --head:#fceef5;
+  --ok:#2bb673; --okbg:#dbf3e7; --warn:#eca24e; --water:#4fb3e6; --snack:#f0a24e; --rice:#5bc08c;
   --shadow:0 1px 2px rgba(15,23,42,.06),0 6px 18px rgba(15,23,42,.07);
   color-scheme:light; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
+  --brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--page-bg:linear-gradient(170deg,#0e1626,#141b2e);--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
 }}
-:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
+:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--page-bg:linear-gradient(170deg,#0e1626,#141b2e);--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 img{max-width:100%}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--ink);font:15px/1.55 "IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
+body{background:var(--page-bg);background-attachment:fixed;color:var(--ink);font:15px/1.55 "IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0);background:var(--brand-a);z-index:30}
 h1,h2,h3{margin:0;font-weight:700;text-wrap:balance}
 button{font:inherit;cursor:pointer}
@@ -48,9 +49,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .tt h1{font-size:18px;line-height:1.2}.tt .sub{color:#b8c6d4;font-size:12.5px}
 .tbtn{margin-left:auto;flex:none;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:9px;width:40px;height:40px;font-size:17px}
 .tbtn:hover{background:rgba(255,255,255,.16)}
-nav{display:flex;background:var(--navy2);padding:6px max(10px,env(safe-area-inset-left,0)) 6px max(10px,env(safe-area-inset-right,0));overflow-x:auto}
+nav{display:flex;background:color-mix(in srgb,var(--card) 84%,transparent);padding:6px max(10px,env(safe-area-inset-left,0)) 6px max(10px,env(safe-area-inset-right,0));overflow-x:auto}
 nav .inner{display:flex;gap:4px;max-width:900px;margin:0 auto;width:100%}
-nav button{flex:1;min-width:max-content;border:0;background:transparent;color:#aebccb;font-weight:600;padding:10px 14px;border-radius:9px;white-space:nowrap;display:flex;align-items:center;gap:7px;justify-content:center}
+nav button{flex:1;min-width:max-content;border:0;background:transparent;color:var(--mute);font-weight:600;padding:10px 14px;border-radius:10px;white-space:nowrap;display:flex;align-items:center;gap:7px;justify-content:center}
 nav button .ic{font-size:16px}
 nav button.on{background:var(--acc);color:var(--accink)}
 main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0));padding-right:max(16px,env(safe-area-inset-right,0));padding-block:18px calc(40px + env(safe-area-inset-bottom,0))}
@@ -171,7 +172,6 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 
 <main>
   <section id="view-entry">
-    <div class="hero"><img src="cover.png" alt="Supply BB — ของเลี้ยงผู้บริจาคโลหิต" width="560" height="315"></div>
     <div class="card pad">
       <div class="sec-h"><span class="dot"></span><h2 id="entryTitle">บันทึกการเบิกของ</h2></div>
       <div class="field"><label>วันที่ออกหน่วย</label>
@@ -251,7 +251,7 @@ function seedData(){return [
 ]}
 
 /* theme */
-(function(){try{var s=localStorage.getItem('supplyTheme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}})();
+(function(){try{var s=localStorage.getItem('supplyTheme');document.documentElement.setAttribute('data-theme',s||'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})();
 $('#themeBtn').addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');var dark=c==='dark'||(!c&&matchMedia('(prefers-color-scheme:dark)').matches);var n=dark?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('supplyTheme',n)}catch(e){}});
 
 /* date dropdowns */
