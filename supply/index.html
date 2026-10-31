@@ -56,6 +56,8 @@ nav button.on{background:var(--acc);color:var(--accink)}
 main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0));padding-right:max(16px,env(safe-area-inset-right,0));padding-block:18px calc(40px + env(safe-area-inset-bottom,0))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
 .pad{padding:16px}
+.hero{border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow);background:linear-gradient(135deg,#dff6ee,#ffe9e0);line-height:0}
+.hero img{display:block;width:100%;max-width:560px;margin:0 auto;height:auto}
 .sec-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .sec-h h2{font-size:17px}.sec-h .dot{width:9px;height:26px;border-radius:5px;background:var(--acc);flex:none}
 .hint{color:var(--mute);font-size:13px}
@@ -152,6 +154,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 
 <main>
   <section id="view-entry">
+    <div class="hero"><img src="cover.png" alt="Supply BB — ของเลี้ยงผู้บริจาคโลหิต" width="560" height="315"></div>
     <div class="card pad">
       <div class="sec-h"><span class="dot"></span><h2 id="entryTitle">บันทึกการเบิกของ</h2></div>
       <div class="field"><label>วันที่ออกหน่วย</label>
