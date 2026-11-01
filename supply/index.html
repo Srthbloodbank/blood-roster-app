@@ -6,7 +6,7 @@
 <title>Supply BB</title>
 <meta name="description" content="บันทึกการเบิกของออกหน่วยรับบริจาคโลหิต ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี พร้อมใบสรุปงานพิมพ์ได้">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffd9e6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e11d48" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e7490" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,19 +20,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --brand-a:#67cfdf; --brand-b:#f69ac7;
-  --navy:#0e7490; --navy2:#0b5566; --acc:#ef5a92; --accink:#fff;
-  --page-bg:linear-gradient(170deg,#e7f6f0 0%,#fdf4ec 45%,#fde8f0 100%);
-  --bg:#fbf3ee; --card:#ffffff; --ink:#3f4555; --mute:#8b90a3; --line:#efe1e9; --head:#fceef5;
-  --ok:#2bb673; --okbg:#dbf3e7; --warn:#eca24e; --water:#4fb3e6; --snack:#f0a24e; --rice:#5bc08c;
-  --top-grad:linear-gradient(120deg,#ffe0ec,#ffd0e0); --top-title:#e11d64; --top-band:#ffd9e6; --field:#fdeef5; --card-soft:#fff7fb;
+  --brand-a:#e11d48; --brand-b:#ff5c8a;
+  --navy:#0e7490; --navy2:#0b5566; --acc:#e11d48; --accink:#fff;
+  --page-bg:linear-gradient(170deg,#fff2f5 0%,#fde9ef 50%,#fef0e9 100%);
+  --bg:#fbf1f2; --card:#ffffff; --ink:#3f4555; --mute:#8b90a3; --line:#f0dce3; --head:#ffe6ee;
+  --ok:#1faf6a; --okbg:#d6f0e0; --warn:#ef9a35; --water:#2f9fe0; --snack:#f0962e; --rice:#2fae76;
+  --top-grad:linear-gradient(120deg,#e11d48,#ff5c8a); --top-title:#ffffff; --top-band:#e11d48; --top-sub:#ffdfe8; --field:#fdeef2; --card-soft:#fff8fa;
   --shadow:0 1px 2px rgba(15,23,42,.06),0 6px 18px rgba(15,23,42,.07);
   color-scheme:light; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--page-bg:linear-gradient(170deg,#0e1626,#141b2e);--top-grad:linear-gradient(120deg,#2a1422,#181426);--top-title:#fb7199;--top-band:#181426;--field:#172338;--card-soft:#131c2b;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
+  --brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--page-bg:linear-gradient(170deg,#0e1626,#141b2e);--top-grad:linear-gradient(120deg,#2a1422,#181426);--top-title:#fb7199;--top-band:#181426;--top-sub:#f0a0b8;--field:#172338;--card-soft:#131c2b;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark;
 }}
-:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--page-bg:linear-gradient(170deg,#0e1626,#141b2e);--top-grad:linear-gradient(120deg,#2a1422,#181426);--top-title:#fb7199;--top-band:#181426;--field:#172338;--card-soft:#131c2b;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
+:root[data-theme="dark"]{--brand-a:#0e7490;--brand-b:#9d174d;--navy:#0b3a46;--navy2:#07222b;--acc:#fb7185;--accink:#2a0510;--page-bg:linear-gradient(170deg,#0e1626,#141b2e);--top-grad:linear-gradient(120deg,#2a1422,#181426);--top-title:#fb7199;--top-band:#181426;--top-sub:#f0a0b8;--field:#172338;--card-soft:#131c2b;--bg:#0b1220;--card:#131c2b;--ink:#e6edf6;--mute:#93a4bd;--line:#273449;--head:#1b2740;--ok:#34d399;--okbg:#0f3d2e;--warn:#fbbf24;--water:#38bdf8;--snack:#fbbf24;--rice:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 img{max-width:100%}
@@ -50,11 +50,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .logo{flex:none;width:42px;height:42px;border-radius:12px;background:#fff;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .logo svg{width:30px;height:30px;display:block}
 .bar .tt{flex:1;min-width:0}
-.helpbtn{flex:none;background:rgba(0,0,0,.04);color:var(--acc);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;font-size:19px;font-weight:800}
-.helpbtn:hover{background:rgba(0,0,0,.08)}
-.tt h1{font-size:20px;line-height:1.2;color:var(--top-title);font-weight:800;letter-spacing:.3px}.tt .sub{color:var(--mute);font-size:12px;font-weight:600;letter-spacing:.3px}
-.tbtn{flex:none;background:rgba(0,0,0,.04);color:var(--acc);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;font-size:17px}
-.tbtn:hover{background:rgba(0,0,0,.08)}
+.helpbtn{flex:none;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.42);border-radius:10px;width:40px;height:40px;font-size:19px;font-weight:800}
+.helpbtn:hover{background:rgba(255,255,255,.32)}
+.tt h1{font-size:20px;line-height:1.2;color:var(--top-title);font-weight:800;letter-spacing:.3px}.tt .sub{color:var(--top-sub);font-size:12px;font-weight:600;letter-spacing:.3px}
+.tbtn{flex:none;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.42);border-radius:10px;width:40px;height:40px;font-size:17px}
+.tbtn:hover{background:rgba(255,255,255,.32)}
 nav{display:flex;background:color-mix(in srgb,var(--card) 84%,transparent);padding:6px max(10px,env(safe-area-inset-left,0)) 6px max(10px,env(safe-area-inset-right,0));overflow-x:auto}
 nav .inner{display:flex;gap:4px;max-width:900px;margin:0 auto;width:100%}
 nav button{flex:1;min-width:max-content;border:0;background:transparent;color:var(--mute);font-weight:600;padding:10px 14px;border-radius:10px;white-space:nowrap;display:flex;align-items:center;gap:7px;justify-content:center}
