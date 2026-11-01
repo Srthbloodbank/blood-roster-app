@@ -217,7 +217,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
   <section id="view-summary" hidden>
     <div class="sec-h"><span class="dot"></span><h2>ใบสรุปงาน (บันทึกข้อความ)</h2></div>
     <div class="monthsel"><label for="sumMonth">เลือกเดือน</label><select id="sumMonth"></select></div>
-    <div class="toolrow"><button class="btn" id="addRowBtn">➕ เพิ่มแถว</button><button class="btn" id="pullBtn">↺ ดึงจากที่บันทึก</button><button class="btn primary" id="printBtn">🖨️ ปริ้นต์เอกสาร</button><button class="btn" id="copyMemoBtn">📋 คัดลอก</button></div>
+    <div class="toolrow"><button class="btn" id="addRowBtn">➕ เพิ่มแถว</button><button class="btn" id="pullBtn">↺ ดึงจากที่บันทึก</button><button class="btn primary" id="printBtn">🖨️ ปริ้นต์ PDF</button><button class="btn" id="wordBtn">📝 Word (แก้ไขได้)</button><button class="btn" id="copyMemoBtn">📋 คัดลอก</button></div>
     <div id="memoHost"></div>
     <div class="hint" style="margin-top:10px">แตะที่ช่องในเอกสารเพื่อแก้ไขได้ · ระบบจำค่าให้อัตโนมัติ · กด “ปริ้นต์เอกสาร” เพื่อพิมพ์หรือบันทึกเป็น PDF</div>
   </section>
@@ -441,11 +441,10 @@ function exportPDF(){
   document.body.appendChild(clone);
   var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
   ready.then(function(){return html2canvas(clone,{scale:2,backgroundColor:'#ffffff',width:780,windowWidth:820})}).then(function(canvas){
-    var pdf=new window.jspdf.jsPDF('p','mm','a4'),pw=210,ph=297,fullH=canvas.height*pw/canvas.width;
-    if(fullH<=ph){pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pw,fullH)}
-    else{var shh=Math.floor(canvas.width*ph/pw),y=0,first=true;
-      while(y<canvas.height){var hh=Math.min(shh,canvas.height-y);var c2=document.createElement('canvas');c2.width=canvas.width;c2.height=hh;c2.getContext('2d').drawImage(canvas,0,y,canvas.width,hh,0,0,canvas.width,hh);if(!first)pdf.addPage();pdf.addImage(c2.toDataURL('image/png'),'PNG',0,0,pw,hh*pw/canvas.width);y+=hh;first=false}}
-    pdf.save('ใบสรุปเบิกของ-'+(sumMonth==='all'?'ทั้งหมด':sumMonth)+'.pdf');toast('บันทึก PDF แล้ว ✓');
+    var pdf=new window.jspdf.jsPDF('p','mm','a4'),pw=210,ph=297,iw=pw,ih=canvas.height*pw/canvas.width;
+    if(ih>ph){ih=ph;iw=canvas.width*ph/canvas.height}
+    pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pw-iw)/2,0,iw,ih);
+    pdf.save('ใบสรุปเบิกของ-'+(sumMonth==='all'?'ทั้งหมด':sumMonth)+'.pdf');toast('บันทึก PDF แล้ว ✓ (หน้าเดียว)');
   }).catch(function(){toast('สร้าง PDF ไม่ได้ ลองใหม่')}).finally(function(){if(clone.parentNode)clone.parentNode.removeChild(clone);btn.textContent=old;btn.disabled=false})}
 $('#addRowBtn').addEventListener('click',function(){memoRows.push({d:'',place:'',water:'',snack:'',rice:'',donors:''});saveMemoRows();renderMemoRows();var inps=$('#m_rows').querySelectorAll('tr:last-child input');if(inps[0])inps[0].focus()});
 $('#pullBtn').addEventListener('click',function(){if(memoRows.length&&!window.confirm('ดึงข้อมูลจากรายการที่บันทึกไว้ จะเขียนทับสิ่งที่พิมพ์แก้ในตารางนี้ ดำเนินการไหม?'))return;memoRows=rowsFromRecords();saveMemoRows();renderMemoRows();toast('ดึงข้อมูลจากที่บันทึกแล้ว ✓')});
@@ -454,6 +453,41 @@ $('#copyMemoBtn').addEventListener('click',function(){
     'ยอดเบิกของเลี้ยงผู้บริจาคโลหิต เดือน '+monthLabel(sumMonth),'',['ว.ด.ป.','สถานที่','น้ำหวาน','ขนม','ข้าว','ผู้บริจาค'].join('\t')];
   memoRows.forEach(function(r){lines.push([r.d||'',r.place||'',r.water||'',r.snack||'',r.rice||'',r.donors||''].join('\t'))});
   lines.push('','จึงเรียนมาเพื่อโปรดพิจารณา','','('+(cfg.signer||'')+')',(cfg.position||''));copyText(lines.join('\n'),'คัดลอกข้อความใบสรุปแล้ว ✓')});
+
+$('#wordBtn').addEventListener('click',exportWord);
+function buildWordHTML(garuda){
+  var dd=$('#m_docdate')?$('#m_docdate').value:(cfg.docDate||'');
+  var rows='';
+  memoRows.forEach(function(r){rows+='<tr><td class="ct">'+esc(r.d||'')+'</td><td>'+esc(r.place||'')+'</td><td class="ct">'+esc((r.water||r.water===0)&&r.water!==''?r.water:'')+'</td><td class="ct">'+esc(r.snack!==''&&r.snack!=null?r.snack:'')+'</td><td class="ct">'+esc(r.rice!==''&&r.rice!=null?r.rice:'')+'</td><td class="ct">'+esc(r.donors!==''&&r.donors!=null?r.donors:'')+'</td></tr>'});
+  return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8">'+
+    '<style>@page{size:A4;margin:1.3cm 1.6cm} body,p,td,th,span{font-family:"TH SarabunPSK","TH Sarabun New","Sarabun",sans-serif;font-size:16pt} '+
+    'p{margin:2pt 0} table{border-collapse:collapse;width:100%;margin-top:6pt} td,th{border:1px solid #000;padding:2pt 6pt} th{font-weight:bold;text-align:center} '+
+    '.ct{text-align:center} .b{font-weight:bold} .t{text-align:center;font-weight:bold;font-size:24pt;margin:4pt 0 8pt} .ind{text-indent:1.3cm;text-align:justify}</style></head><body>'+
+    (garuda?'<p class="ct"><img src="'+garuda+'" width="72" height="80"></p>':'')+
+    '<p class="t">บันทึกข้อความ</p>'+
+    '<p><span class="b">ส่วนราชการ</span>&nbsp;&nbsp;'+esc(cfg.org||'')+'</p>'+
+    '<p><span class="b">ที่</span>&nbsp;&nbsp;'+esc(cfg.docNo||'')+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="b">วันที่</span>&nbsp;&nbsp;'+esc(dd)+'</p>'+
+    '<p><span class="b">เรื่อง</span>&nbsp;&nbsp;'+esc(cfg.subject||'')+'</p>'+
+    '<p><span class="b">เรียน</span>&nbsp;&nbsp;'+esc(cfg.to||'')+'</p>'+
+    '<p class="ind">ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน '+esc(monthLabel(sumMonth))+' ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้</p>'+
+    '<table><thead><tr><th style="width:20%">ว.ด.ป.</th><th>สถานที่</th><th style="width:11%">น้ำหวาน</th><th style="width:9%">ขนม</th><th style="width:9%">ข้าว</th><th style="width:13%">ผู้บริจาค<br>(รับจริง)</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<p class="ind" style="margin-top:14pt">จึงเรียนมาเพื่อโปรดพิจารณา</p>'+
+    '<p class="ct" style="margin-top:30pt">(&nbsp;&nbsp;'+esc(cfg.signer||'')+'&nbsp;&nbsp;)</p>'+
+    '<p class="ct">'+esc(cfg.position||'')+'</p></body></html>';
+}
+function exportWord(){
+  if(!memoRows.length&&!records.length){toast('ยังไม่มีข้อมูล');return}
+  function go(garuda){
+    try{
+      var html=buildWordHTML(garuda);
+      var blob=new Blob(['﻿'+html],{type:'application/msword'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ใบสรุปเบิกของ-'+(sumMonth==='all'?'ทั้งหมด':sumMonth)+'.doc';
+      document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);
+      toast('บันทึกไฟล์ Word แล้ว ✓ เปิดแก้ไขได้');
+    }catch(e){toast('สร้างไฟล์ Word ไม่ได้')}
+  }
+  fetch('garuda.png').then(function(r){return r.blob()}).then(function(b){return new Promise(function(res){var fr=new FileReader();fr.onload=function(){res(fr.result)};fr.onerror=function(){res('')};fr.readAsDataURL(b)})}).then(go).catch(function(){go('')});
+}
 
 function copyText(txt,ok){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast(ok)}).catch(function(){fb(txt,ok)})}else fb(txt,ok)}
 function fb(txt,ok){try{var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast(ok)}catch(e){toast('คัดลอกไม่สำเร็จ')}}
