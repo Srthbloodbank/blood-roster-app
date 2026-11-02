@@ -218,6 +218,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
   <section id="view-summary" hidden>
     <div class="sec-h"><span class="dot"></span><h2>ใบสรุปงาน (บันทึกข้อความ)</h2></div>
     <div class="monthsel"><label for="sumMonth">เลือกเดือน</label><select id="sumMonth"></select></div>
+    <div class="field" style="margin-bottom:12px"><label style="color:var(--acc)">วันที่ของเอกสาร (บันทึกข้อความ)</label><div class="drow"><select id="dd_day" aria-label="วัน"></select><select id="dd_mon" aria-label="เดือน"></select><select id="dd_year" aria-label="ปี พ.ศ."></select></div></div>
     <div class="toolrow"><button class="btn" id="addRowBtn">➕ เพิ่มแถว</button><button class="btn" id="pullBtn">↺ ดึงจากที่บันทึก</button><button class="btn primary" id="printBtn">🖨️ ปริ้นต์ PDF</button><button class="btn" id="wordBtn">📝 Word (แก้ไขได้)</button><button class="btn" id="copyMemoBtn">📋 คัดลอก</button></div>
     <div id="memoHost"></div>
     <div class="hint" style="margin-top:10px">แตะที่ช่องในเอกสารเพื่อแก้ไขได้ · ระบบจำค่าให้อัตโนมัติ · กด “ปริ้นต์เอกสาร” เพื่อพิมพ์หรือบันทึกเป็น PDF</div>
@@ -383,7 +384,17 @@ function buildMonthOptions(){var sel=$('#sumMonth'),cur=sumMonth;sel.innerHTML='
 $('#sumMonth').addEventListener('change',function(){sumMonth=this.value;renderSummary()});
 function filteredRecords(){var rs=records.slice();if(sumMonth&&sumMonth!=='all')rs=rs.filter(function(r){return monthKey(r.date)===sumMonth});
   rs.sort(function(a,b){return String(a.date).localeCompare(String(b.date))||String(a.createdAt).localeCompare(String(b.createdAt))});return rs}
-function renderSummary(){buildMonthOptions();buildMemo();loadMemoRows();refreshPlaces();renderMemoRows();updateMemoBody()}
+function renderSummary(){buildMonthOptions();buildMemo();initDocDatePicker();loadMemoRows();refreshPlaces();renderMemoRows();updateMemoBody()}
+var docPickerInit=false;
+function initDocDatePicker(){
+  if(docPickerInit)return;var dd=$('#dd_day'),mm=$('#dd_mon'),yy=$('#dd_year');if(!dd||!mm||!yy)return;docPickerInit=true;
+  for(var i=1;i<=31;i++){var o=document.createElement('option');o.value=i;o.textContent=i;dd.appendChild(o)}
+  TH_MFULL.forEach(function(nm,i){var o=document.createElement('option');o.value=i+1;o.textContent=nm;mm.appendChild(o)});
+  var cy=new Date().getFullYear()+543;for(var y=cy+1;y>=cy-3;y--){var o2=document.createElement('option');o2.value=y;o2.textContent='พ.ศ. '+y;yy.appendChild(o2)}
+  var t=todayISO().split('-');dd.value=+t[2];mm.value=+t[1];yy.value=(+t[0])+543;
+  function apply(){var iso=(+yy.value-543)+'-'+String(+mm.value).padStart(2,'0')+'-'+String(+dd.value).padStart(2,'0');var txt=thDateFull(iso);var inp=$('#m_docdate');if(inp)inp.value=txt;cfg.docDate=txt;saveCfg()}
+  [dd,mm,yy].forEach(function(s){s.addEventListener('change',apply)});
+}
 function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_COLS.map(function(c){return '<th>'+c.h+'</th>'}).join('');
   host.innerHTML='<div class="memoscroll"><div class="memo" id="memoPage">'+
     '<img class="garuda" src="garuda.png" alt="ตราครุฑ"><div class="mt">บันทึกข้อความ</div>'+
