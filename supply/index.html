@@ -381,7 +381,7 @@ function buildMonthOptions(){var sel=$('#sumMonth'),cur=sumMonth;sel.innerHTML='
   var list=Object.keys(mks).sort().reverse();var a=document.createElement('option');a.value='all';a.textContent='ทั้งหมด';sel.appendChild(a);
   list.forEach(function(mk){var o=document.createElement('option');o.value=mk;o.textContent=monthLabel(mk);sel.appendChild(o)});
   if(!cur)cur=list.length?list[0]:'all';if(cur!=='all'&&list.indexOf(cur)<0)cur=list.length?list[0]:'all';sumMonth=cur;sel.value=cur}
-$('#sumMonth').addEventListener('change',function(){sumMonth=this.value;renderSummary()});
+$('#sumMonth').addEventListener('change',function(){sumMonth=this.value;renderSummary();var bm=$('#m_bodymonth');if(bm)bm.value=monthLabelTH(sumMonth)});
 function filteredRecords(){var rs=records.slice();if(sumMonth&&sumMonth!=='all')rs=rs.filter(function(r){return monthKey(r.date)===sumMonth});
   rs.sort(function(a,b){return String(a.date).localeCompare(String(b.date))||String(a.createdAt).localeCompare(String(b.createdAt))});return rs}
 function renderSummary(){buildMonthOptions();buildMemo();initDocDatePicker();loadMemoRows();refreshPlaces();renderMemoRows();updateMemoBody()}
@@ -402,7 +402,7 @@ function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_C
     '<div class="two"><div><span class="lab">ที่</span><input class="fin" id="m_docno"></div><div><span class="lab">วันที่</span><input class="fin" id="m_docdate"></div></div>'+
     '<div class="frow"><span class="lab">เรื่อง</span><input class="fin" id="m_subject" style="flex:1"></div>'+
     '<div class="frow"><span class="lab">เรียน</span><input class="fin" id="m_to" style="flex:1"></div>'+
-    '<div class="mbody" id="m_body"></div>'+
+    '<div class="mbody">ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน <input class="fin" id="m_bodymonth" style="width:188px;text-align:center" aria-label="เดือนและปี"> ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้</div>'+
     '<datalist id="unitlist"></datalist>'+
     '<table><thead><tr><th style="width:152px">ว.ด.ป.</th><th>สถานที่</th><th style="width:52px">น้ำหวาน</th><th style="width:44px">ขนม</th><th style="width:44px">ข้าว</th><th style="width:56px">ผู้บริจาค<br>(รับจริง)</th><th class="noprint" style="width:28px"></th></tr></thead><tbody id="m_rows"></tbody></table>'+
     '<div class="sign"><div class="line1">จึงเรียนมาเพื่อโปรดพิจารณา</div><div class="sb"><div>(&nbsp;<input class="fin" id="m_signer" style="text-align:center;width:300px">&nbsp;)</div><div><input class="fin" id="m_position" style="text-align:center;width:300px"></div></div></div>'+
@@ -415,8 +415,9 @@ function buildMemo(){if(memoBuilt)return;var host=$('#memoHost');var cols=MEMO_C
     document.getElementById(p[0]).addEventListener('input',function(){cfg[p[1]]=this.value;saveCfg()})});
   $('#m_rows').addEventListener('input',function(e){var inp=e.target.closest('input[data-f]');if(!inp)return;var i=+inp.dataset.i,f=inp.dataset.f;if(!memoRows[i])return;memoRows[i][f]=(f==='d'||f==='place')?inp.value:(inp.value===''?'':num(inp.value));memoRowsDirtySave()});
   $('#m_rows').addEventListener('click',function(e){var b=e.target.closest('button[data-del]');if(!b)return;memoRows.splice(+b.dataset.del,1);saveMemoRows();renderMemoRows()});
+  var bm0=$('#m_bodymonth');if(bm0){if(!bm0.value)bm0.value=monthLabelTH(sumMonth);bm0.addEventListener('input',function(){var s=thNum(this.value);if(s!==this.value)this.value=s})}
 }
-function updateMemoBody(){if(!memoBuilt)return;$('#m_body').textContent='ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน '+monthLabelTH(sumMonth)+' ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้'}
+function updateMemoBody(){if(!memoBuilt)return;var bm=$('#m_bodymonth');if(bm&&!bm.value)bm.value=monthLabelTH(sumMonth)}
 function memoKey(){return 'supplyMemoRows_'+(sumMonth||'all')}
 function rowsFromRecords(){return filteredRecords().map(function(r){return {d:thDateTbl(r.date),place:r.place||'',water:num(r.water),snack:num(r.snack),rice:num(r.rice),donors:num(r.donors)}})}
 function loadMemoRows(){var saved=null;try{saved=JSON.parse(localStorage.getItem(memoKey())||'null')}catch(e){}memoRows=(saved&&saved.length!=null)?saved:rowsFromRecords()}
@@ -463,13 +464,14 @@ $('#addRowBtn').addEventListener('click',function(){memoRows.push({d:'',place:''
 $('#pullBtn').addEventListener('click',function(){if(memoRows.length&&!window.confirm('ดึงข้อมูลจากรายการที่บันทึกไว้ จะเขียนทับสิ่งที่พิมพ์แก้ในตารางนี้ ดำเนินการไหม?'))return;memoRows=rowsFromRecords();saveMemoRows();renderMemoRows();toast('ดึงข้อมูลจากที่บันทึกแล้ว ✓')});
 $('#copyMemoBtn').addEventListener('click',function(){
   var lines=['บันทึกข้อความ','ส่วนราชการ '+(cfg.org||''),'ที่ '+(cfg.docNo||''),'วันที่ '+($('#m_docdate')?$('#m_docdate').value:(cfg.docDate||'')),'เรื่อง '+(cfg.subject||''),'เรียน '+(cfg.to||''),'',
-    'ยอดเบิกของเลี้ยงผู้บริจาคโลหิต เดือน '+monthLabel(sumMonth),'',['ว.ด.ป.','สถานที่','น้ำหวาน','ขนม','ข้าว','ผู้บริจาค'].join('\t')];
+    'ยอดเบิกของเลี้ยงผู้บริจาคโลหิต เดือน '+((($('#m_bodymonth')||{}).value)||monthLabelTH(sumMonth)),'',['ว.ด.ป.','สถานที่','น้ำหวาน','ขนม','ข้าว','ผู้บริจาค'].join('\t')];
   memoRows.forEach(function(r){lines.push([r.d||'',r.place||'',r.water||'',r.snack||'',r.rice||'',r.donors||''].join('\t'))});
   lines.push('','จึงเรียนมาเพื่อโปรดพิจารณา','','('+(cfg.signer||'')+')',(cfg.position||''));copyText(lines.join('\n'),'คัดลอกข้อความใบสรุปแล้ว ✓')});
 
 $('#wordBtn').addEventListener('click',exportWord);
 function buildWordHTML(garuda){
   var dd=$('#m_docdate')?$('#m_docdate').value:(cfg.docDate||'');
+  var bmEl=$('#m_bodymonth');var monthTxt=(bmEl&&bmEl.value)?bmEl.value:monthLabelTH(sumMonth);
   var rows='';
   memoRows.forEach(function(r){rows+='<tr><td class="ct nw">'+esc(thNum(r.d||''))+'</td><td>'+esc(thNum(String(r.place||'')))+'</td><td class="ct">'+esc(thNum(String(r.water||'')))+'</td><td class="ct">'+esc(thNum(String(r.snack||'')))+'</td><td class="ct">'+esc(thNum(String(r.rice||'')))+'</td><td class="ct">'+esc(thNum(String(r.donors||'')))+'</td></tr>'});
   return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8">'+
@@ -482,7 +484,7 @@ function buildWordHTML(garuda){
     '<p><span class="b">ที่</span>&nbsp;&nbsp;'+esc(cfg.docNo||'')+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="b">วันที่</span>&nbsp;&nbsp;'+esc(dd)+'</p>'+
     '<p><span class="b">เรื่อง</span>&nbsp;&nbsp;'+esc(cfg.subject||'')+'</p>'+
     '<p><span class="b">เรียน</span>&nbsp;&nbsp;'+esc(cfg.to||'')+'</p>'+
-    '<p class="ind">ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน '+esc(monthLabelTH(sumMonth))+' ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้</p>'+
+    '<p class="ind">ด้วยงานธนาคารเลือด ได้ออกหน่วยรับบริจาคโลหิตเคลื่อนที่ เดือน '+esc(monthTxt)+' ซึ่งยอดเบิกของเลี้ยงผู้บริจาคโลหิต มีดังนี้</p>'+
     '<table><thead><tr><th style="width:20%">ว.ด.ป.</th><th>สถานที่</th><th style="width:11%">น้ำหวาน</th><th style="width:9%">ขนม</th><th style="width:9%">ข้าว</th><th style="width:13%">ผู้บริจาค<br>(รับจริง)</th></tr></thead><tbody>'+rows+'</tbody></table>'+
     '<p class="ind" style="margin-top:14pt">จึงเรียนมาเพื่อโปรดพิจารณา</p>'+
     '<p class="ct" style="margin-top:30pt">(&nbsp;&nbsp;'+esc(cfg.signer||'')+'&nbsp;&nbsp;)</p>'+
