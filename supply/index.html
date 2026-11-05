@@ -103,6 +103,16 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .billsum .bs-h{font-weight:700;color:var(--snack);margin-bottom:8px;font-size:14px}
 .billbtn{margin-top:9px;width:100%;padding:8px;border:1px dashed color-mix(in srgb,var(--snack) 55%,var(--line));border-radius:11px;background:color-mix(in srgb,var(--snack) 8%,var(--card));color:var(--snack);font-size:12.5px;font-weight:700;cursor:pointer}
 .billbtn:active{transform:scale(.98)}
+.billverify{border:1px solid color-mix(in srgb,var(--snack) 30%,var(--line));border-radius:14px;background:var(--card);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+.bv-h{font-weight:700;color:var(--snack);font-size:13.5px;padding:10px 12px;background:color-mix(in srgb,var(--snack) 10%,var(--card));border-bottom:1px solid color-mix(in srgb,var(--snack) 20%,var(--line))}
+.vr{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.vr:last-child{border-bottom:0}
+.vr .vd{min-width:46px;color:var(--mute);font-variant-numeric:tabular-nums}
+.vr .vp{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vr .vs{color:var(--snack);font-variant-numeric:tabular-nums;white-space:nowrap}
+.vr .vc{color:var(--mute);font-size:11px;white-space:nowrap}
+.vr .ve{flex:none;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px 7px;cursor:pointer;font-size:12px}
+.vr .ve:active{transform:scale(.95)}
 .rec{display:flex;gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--shadow);margin-bottom:12px}
 .rec .date{flex:none;width:58px;text-align:center;border-right:1px solid var(--line);padding-right:12px}
 .rec .date .d{font-size:22px;font-weight:800;line-height:1;color:var(--acc)}.rec .date .my{font-size:11.5px;color:var(--mute);margin-top:3px}
@@ -381,6 +391,11 @@ function renderHistory(){var wrap=$('#histWrap');wrap.innerHTML='';refreshPlaces
   var stot=0;records.forEach(function(r){stot+=num(r.snack)});var base=billBaseGet();var round=Math.max(0,stot-base);var bi=billInfo(round);
   var bc=el('div','billsum');bc.innerHTML='<div class="bs-h">🍪 สรุปบิลขนม (บิลละไม่เกิน '+thNum(BILL_CAP)+' ชิ้น)</div><div class="billrow"><span>ขนมรอบนี้ (ตั้งแต่เริ่มนับ)</span><b>'+thNum(round)+' ชิ้น</b></div><div class="billrow"><span>บิลปัจจุบัน (บิลที่ '+thNum(bi.current)+')</span><b>'+thNum(bi.rem)+' / '+thNum(BILL_CAP)+' ชิ้น</b></div><div class="billrow"><span>ขนมสะสมทั้งหมด (ทุกรอบ)</span><b>'+thNum(stot)+' ชิ้น</b></div><button type="button" class="billbtn" id="billResetBtn2">🔄 เริ่มนับบิลใหม่ (ตั้งเป็น ๐)</button>';wrap.appendChild(bc);
   var rb2=bc.querySelector('#billResetBtn2');if(rb2)rb2.onclick=resetBill;
+  var snackRecs=records.filter(function(r){return num(r.snack)>0}).sort(function(a,b){return String(a.date).localeCompare(String(b.date))||String(a.createdAt).localeCompare(String(b.createdAt))});
+  if(snackRecs.length){var vwrap=el('div','billverify');var cum=0,rows='';
+    snackRecs.forEach(function(r){var s=num(r.snack);cum+=s;var billNo=Math.ceil(cum/BILL_CAP)||1;var pos=cum%BILL_CAP;if(pos===0)pos=BILL_CAP;var p=String(r.date).split('-');var dmy=thNum(+p[2]||0)+'/'+thNum(+p[1]||0);
+      rows+='<div class="vr"><span class="vd">'+dmy+'</span><span class="vp">'+esc(r.place||'(ไม่ระบุ)')+'</span><b class="vs">'+thNum(s)+' ชิ้น</b><span class="vc">บิล '+thNum(billNo)+' · '+thNum(pos)+'/'+thNum(BILL_CAP)+'</span><button class="ve" data-edit="'+r.id+'">✏️</button></div>'});
+    vwrap.innerHTML='<div class="bv-h">🔍 ทวนสอบขนมรายวัน ('+thNum(snackRecs.length)+' วัน)</div>'+rows;wrap.appendChild(vwrap)}
   records.forEach(function(r){var rec=el('div','rec');var chips='';CATS.forEach(function(c){chips+='<span class="chip chip-'+c.key+'">'+c.icon+' '+c.name+' <b class="tnum">'+num(r[c.key])+'</b></span>'});(r.extra||[]).forEach(function(x){if(x.n)chips+='<span class="chip">📦 '+esc(x.n)+' <b class="tnum">'+num(x.q)+'</b></span>'});
     rec.innerHTML='<div class="date"><div class="d tnum">'+(String(r.date).split("-")[2]||"?")+'</div><div class="my">'+monthShort(r.date)+'</div></div>'+
       '<div class="body"><div class="place">📍 <span></span></div><div class="meta"></div><div class="chips">'+chips+'</div>'+
