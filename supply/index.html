@@ -103,6 +103,7 @@ main{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .billsum .bs-h{font-weight:700;color:var(--snack);margin-bottom:8px;font-size:14px}
 .billbtn{margin-top:9px;width:100%;padding:8px;border:1px dashed color-mix(in srgb,var(--snack) 55%,var(--line));border-radius:11px;background:color-mix(in srgb,var(--snack) 8%,var(--card));color:var(--snack);font-size:12.5px;font-weight:700;cursor:pointer}
 .billbtn:active{transform:scale(.98)}
+.billbtns{display:flex;gap:8px;margin-top:9px}.billbtns .billbtn{margin-top:0;flex:1}
 .billverify{border:1px solid color-mix(in srgb,var(--snack) 30%,var(--line));border-radius:14px;background:var(--card);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
 .bv-h{font-weight:700;color:var(--snack);font-size:13.5px;padding:10px 12px;background:color-mix(in srgb,var(--snack) 10%,var(--card));border-bottom:1px solid color-mix(in srgb,var(--snack) 20%,var(--line))}
 .vr{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px}
@@ -335,12 +336,13 @@ var BILL_CAP=2000;
 function billInfo(total){var t=Math.max(0,total);var bills=t<=0?1:Math.ceil(t/BILL_CAP);var rem=t%BILL_CAP;if(rem===0&&t>0)rem=BILL_CAP;return{total:t,bills:bills,current:bills,rem:rem}}
 function snackSumExcluding(id){var s=0;records.forEach(function(r){if(r.id!==id)s+=num(r.snack)});return s}
 function billBaseGet(){try{return num(localStorage.getItem('bb_billbase'))}catch(e){return 0}}
-function billBaseSet(v){try{localStorage.setItem('bb_billbase',String(Math.max(0,v)))}catch(e){}}
+function billBaseSet(v){try{localStorage.setItem('bb_billbase',String(Math.round(v)))}catch(e){}}
 function liveSnackTotal(){return snackSumExcluding(editingId)+num((document.getElementById('q_snack')||{}).value)}
 function resetBill(){var tot=liveSnackTotal();if(!confirm('เริ่มนับบิลขนมใหม่?\nยอดรอบนี้จะกลับไปเป็น ๐ ชิ้น (ข้อมูลที่บันทึกไว้ทั้งหมดยังอยู่ครบ)'))return;billBaseSet(tot);updateBillStatus();renderHistory()}
+function setBillStart(){var tot=liveSnackTotal();var cur=Math.max(0,tot-billBaseGet());var inp=prompt('ใส่ยอดขนม “เริ่มต้น” ของรอบนี้ (ชิ้น)\nเช่น บิลนี้มีอยู่แล้ว 500 ชิ้น ให้พิมพ์ 500 แล้วระบบจะนับต่อจากยอดนี้',String(cur));if(inp===null)return;var n=Math.max(0,num(inp));billBaseSet(tot-n);updateBillStatus();renderHistory()}
 function updateBillStatus(){var box=$('#billBox');if(!box)return;var base=billBaseGet();var round=Math.max(0,liveSnackTotal()-base);var info=billInfo(round);
-  box.innerHTML='<div class="billrow"><span>🍪 ยอดขนมรอบนี้</span><b>'+thNum(round)+' ชิ้น</b></div><div class="billrow"><span>บิลปัจจุบัน (บิลที่ '+thNum(info.current)+')</span><b>'+thNum(info.rem)+' / '+thNum(BILL_CAP)+' ชิ้น</b></div><button type="button" class="billbtn" id="billResetBtn">🔄 เริ่มนับบิลใหม่ (ตั้งเป็น ๐)</button>';
-  var rb=$('#billResetBtn');if(rb)rb.onclick=resetBill;}
+  box.innerHTML='<div class="billrow"><span>🍪 ยอดขนมรอบนี้</span><b>'+thNum(round)+' ชิ้น</b></div><div class="billrow"><span>บิลปัจจุบัน (บิลที่ '+thNum(info.current)+')</span><b>'+thNum(info.rem)+' / '+thNum(BILL_CAP)+' ชิ้น</b></div><div class="billbtns"><button type="button" class="billbtn" id="billResetBtn">🔄 เริ่มใหม่ (๐)</button><button type="button" class="billbtn" id="billSetBtn">🔢 ใส่ยอดเริ่มต้น</button></div>';
+  var rb=$('#billResetBtn');if(rb)rb.onclick=resetBill;var sb=$('#billSetBtn');if(sb)sb.onclick=setBillStart;}
 function liveTotal(){updateBillStatus()}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 var extraItems=[];
@@ -389,8 +391,8 @@ function lineMsg(r){var p=String(r.date).split('-');var dd=+p[2],mm=+p[1],yy=((+
 function renderHistory(){var wrap=$('#histWrap');wrap.innerHTML='';refreshPlaces();
   if(!records.length){wrap.appendChild(emptyBox('🗂️','ยังไม่มีประวัติการเบิก','กดแท็บ “บันทึกเบิก” เพื่อเพิ่มรายการแรก'));return}
   var stot=0;records.forEach(function(r){stot+=num(r.snack)});var base=billBaseGet();var round=Math.max(0,stot-base);var bi=billInfo(round);
-  var bc=el('div','billsum');bc.innerHTML='<div class="bs-h">🍪 สรุปบิลขนม (บิลละไม่เกิน '+thNum(BILL_CAP)+' ชิ้น)</div><div class="billrow"><span>ขนมรอบนี้ (ตั้งแต่เริ่มนับ)</span><b>'+thNum(round)+' ชิ้น</b></div><div class="billrow"><span>บิลปัจจุบัน (บิลที่ '+thNum(bi.current)+')</span><b>'+thNum(bi.rem)+' / '+thNum(BILL_CAP)+' ชิ้น</b></div><div class="billrow"><span>ขนมสะสมทั้งหมด (ทุกรอบ)</span><b>'+thNum(stot)+' ชิ้น</b></div><button type="button" class="billbtn" id="billResetBtn2">🔄 เริ่มนับบิลใหม่ (ตั้งเป็น ๐)</button>';wrap.appendChild(bc);
-  var rb2=bc.querySelector('#billResetBtn2');if(rb2)rb2.onclick=resetBill;
+  var bc=el('div','billsum');bc.innerHTML='<div class="bs-h">🍪 สรุปบิลขนม (บิลละไม่เกิน '+thNum(BILL_CAP)+' ชิ้น)</div><div class="billrow"><span>ขนมรอบนี้ (ตั้งแต่เริ่มนับ)</span><b>'+thNum(round)+' ชิ้น</b></div><div class="billrow"><span>บิลปัจจุบัน (บิลที่ '+thNum(bi.current)+')</span><b>'+thNum(bi.rem)+' / '+thNum(BILL_CAP)+' ชิ้น</b></div><div class="billrow"><span>ขนมสะสมทั้งหมด (ทุกรอบ)</span><b>'+thNum(stot)+' ชิ้น</b></div><div class="billbtns"><button type="button" class="billbtn" id="billResetBtn2">🔄 เริ่มใหม่ (๐)</button><button type="button" class="billbtn" id="billSetBtn2">🔢 ใส่ยอดเริ่มต้น</button></div>';wrap.appendChild(bc);
+  var rb2=bc.querySelector('#billResetBtn2');if(rb2)rb2.onclick=resetBill;var sb2=bc.querySelector('#billSetBtn2');if(sb2)sb2.onclick=setBillStart;
   var snackRecs=records.filter(function(r){return num(r.snack)>0}).sort(function(a,b){return String(a.date).localeCompare(String(b.date))||String(a.createdAt).localeCompare(String(b.createdAt))});
   if(snackRecs.length){var vwrap=el('div','billverify');var cum=0,rows='';
     snackRecs.forEach(function(r){var s=num(r.snack);cum+=s;var billNo=Math.ceil(cum/BILL_CAP)||1;var pos=cum%BILL_CAP;if(pos===0)pos=BILL_CAP;var p=String(r.date).split('-');var dmy=thNum(+p[2]||0)+'/'+thNum(+p[1]||0);
