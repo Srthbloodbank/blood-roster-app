@@ -36,6 +36,11 @@ jobs:
              supply/icon-192.png supply/icon-512.png supply/icon-maskable-512.png \
              supply/apple-touch-icon.png supply/favicon.ico _site/supply/
 
+      - name: Add HOMC roster page
+        run: |
+          mkdir -p _site/homc
+          cp homc/index.html _site/homc/
+
       - name: Configure Pages (เปิด Pages ให้อัตโนมัติ)
         uses: actions/configure-pages@v5
         with:

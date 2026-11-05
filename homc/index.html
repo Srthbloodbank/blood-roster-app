@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ตารางเวร HOMC</title>
+<style>
+:root{
+  --bg:#0f172a;--surface:#1e293b;--surface2:#334155;--border:#475569;
+  --text:#f1f5f9;--muted:#94a3b8;--accent:#3b82f6;--accentd:#2563eb;
+  --ok:#22c55e;--warn:#f59e0b;--err:#ef4444;
+  --s0bg:#1e3a8a;--s0t:#93c5fd;
+  --s1bg:#0e7490;--s1t:#a5f3fc;
+  --s2bg:#4c1d95;--s2t:#c4b5fd;
+  --s3bg:#9d174d;--s3t:#fda4af;
+  --s4bg:#78350f;--s4t:#fcd34d;
+  --s5bg:#065f46;--s5t:#6ee7b7;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;min-height:100dvh;display:flex;flex-direction:column}
+#loading{position:fixed;inset:0;background:#0f172acc;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px}
+.spinner{width:40px;height:40px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-title{font-size:1.1rem;font-weight:700;color:var(--text)}
+.hdr-sub{font-size:.75rem;color:var(--muted)}
+.hdr-nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;cursor:pointer;transition:.2s}
+.nav-btn:hover,.nav-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+main{flex:1;overflow:auto;padding:12px}
+.month-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.month-bar select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-size:.85rem}
+.btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accentd)}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--err);color:#fff}
+.btn-success{background:var(--ok);color:#fff}
+/* Table */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:420px}
+th{background:var(--surface2);padding:8px 6px;text-align:center;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:6px 5px;border-bottom:1px solid #1e293b;text-align:center;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.weekend{background:#1e293b66}
+tr.today td:first-child{font-weight:700;color:var(--accent)}
+/* Badges */
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:3px 8px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;min-width:52px;transition:.12s}
+.badge:hover{opacity:.85;transform:scale(1.04)}
+.badge.empty{background:var(--surface2);color:var(--muted);border:1px dashed var(--border)}
+.s0{background:var(--s0bg);color:var(--s0t)}
+.s1{background:var(--s1bg);color:var(--s1t)}
+.s2{background:var(--s2bg);color:var(--s2t)}
+.s3{background:var(--s3bg);color:var(--s3t)}
+.s4{background:var(--s4bg);color:var(--s4t)}
+.s5{background:var(--s5bg);color:var(--s5t)}
+.smc{background:#374151;color:#fbbf24;border:1px solid #fbbf2466}
+/* Conflict */
+.conflict-box{background:#7f1d1d33;border:1px solid var(--err);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.8rem;color:#fca5a5;display:flex;flex-direction:column;gap:4px}
+/* Chips */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:12px;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:.8rem;font-weight:600}
+/* Modal */
+.overlay{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;justify-content:center;z-index:999;padding:16px}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:70vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.modal-body{flex:1;overflow-y:auto;padding:8px}
+.pick-item{padding:12px 14px;cursor:pointer;border-radius:8px;font-size:.88rem;display:flex;align-items:center;gap:8px;transition:.12s}
+.pick-item:hover{background:var(--surface2)}
+.pick-item.none{color:var(--muted)}
+/* Info modal */
+.info-modal{background:var(--surface);border-radius:12px;width:90%;max-width:380px;padding:20px;text-align:center}
+.info-modal h3{margin-bottom:8px}
+.info-modal p{color:var(--muted);font-size:.85rem;margin-bottom:16px}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e3a5f;color:#93c5fd;border:1px solid #3b82f6;padding:10px 20px;border-radius:10px;font-size:.85rem;z-index:1000;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+/* Report */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:1.5rem;font-weight:700;color:var(--accent)}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:2px}
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;overflow-x:auto}
+.chart-title{font-size:.85rem;font-weight:700;margin-bottom:12px;color:var(--muted)}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;min-width:280px}
+.bar-name{font-size:.78rem;width:84px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:16px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.bar-val{font-size:.75rem;width:28px;text-align:right;color:var(--muted)}
+.report-tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.report-tbl{width:100%;border-collapse:collapse;font-size:.78rem}
+.report-tbl th{background:var(--surface2);padding:7px 8px;text-align:center;color:var(--muted);border-bottom:1px solid var(--border)}
+.report-tbl td{padding:6px 8px;text-align:center;border-bottom:1px solid #1e293b}
+/* Admin */
+.admin-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.admin-title{font-size:.9rem;font-weight:700;margin-bottom:12px;color:var(--muted)}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.admin-row{display:flex;flex-direction:column;gap:4px;padding:10px;background:var(--surface2);border-radius:8px}
+.admin-row label{font-size:.75rem;color:var(--muted)}
+.admin-row select,.admin-row input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:.82rem;width:100%}
+.staff-list-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.staff-list-row input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:.82rem}
+
+/* GAS mode indicator */
+.gas-badge{font-size:.7rem;padding:2px 8px;border-radius:5px;font-weight:700}
+.gas-badge.connected{background:#14532d;color:#86efac}
+.gas-badge.local{background:#1c1917;color:#a8a29e}
+
+@media print{
+  header .hdr-nav,.month-bar .btn,.btn,.overlay,#loading{display:none!important}
+  .chips-wrap{display:none!important}
+  body{background:#fff;color:#000}
+  .tbl-wrap{border:1px solid #ccc}
+  td,th{color:#000;border-color:#ccc}
+  .badge{border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><span style="color:var(--muted);font-size:.85rem">กำลังโหลดข้อมูล...</span></div>
+
+<header>
+  <div class="hdr-left">
+    <div>
+      <div class="hdr-title">ตารางเวร HOMC</div>
+      <div class="hdr-sub" id="hdrSub">—</div>
+    </div>
+    <span id="gasBadge" class="gas-badge local">offline</span>
+  </div>
+  <nav class="hdr-nav">
+    <button class="nav-btn active" data-v="main">📋 ตาราง</button>
+    <button class="nav-btn" data-v="swap">🔄 แลกเวร</button>
+    <button class="nav-btn" data-v="report">📊 รายงาน</button>
+    <button class="nav-btn" data-v="admin">⚙️ จัดการ</button>
+  </nav>
+</header>
+
+<main id="main"></main>
+
+<div id="pickerOverlay" class="overlay" style="display:none" onclick="closePicker(event)">
+  <div class="modal">
+    <div class="modal-head"><span id="pickerTitle">เลือกเจ้าหน้าที่</span><button onclick="closePicker()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button></div>
+    <div class="modal-body"><div id="pickerList"></div></div>
+  </div>
+</div>
+
+<div id="infoOverlay" class="overlay" style="display:none" onclick="closeInfo()">
+  <div class="info-modal" onclick="event.stopPropagation()">
+    <h3 id="infoTitle"></h3>
+    <p id="infoMsg"></p>
+    <button class="btn btn-primary" onclick="closeInfo()">ตกลง</button>
+  </div>
+</div>
+
+<script>
+// ===== CONSTANTS =====
+const DN = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const SLOT_WD = ["เวรเที่ยง","07-08(1)","07-08(2)","16-08"];
+const SLOT_WE = ["SMC","07-16","08-16","16-08"];
+
+// ===== STATE =====
+const SRV = 'Google Sheets';
+const DEFAULT_SHEET = '1nHgEW_gowsaALbBMt3ktUz7MV8B8KBPRiMq077-DQoA';
+const HEADERS = ["วันที่","วัน","เวรเที่ยง","07.00-08.00 (1)","07.00-08.00 (2)","07.00-16.00","08.00-16.00","16.00-08.00"];
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+let MODE = 'local', mcp = null, sheetTitles = [], connMsg = '';
+let API_URL = (lsGet('homc_api_url')||'').trim();
+async function apiGet(params){
+  const r=await fetch(API_URL+(API_URL.includes('?')?'&':'?')+new URLSearchParams(params),{redirect:'follow'});
+  return r.json();
+}
+async function apiPost(body){
+  const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'});
+  return r.json();
+}
+async function fetchFromApi(){
+  showLoading();
+  try{
+    const res=await apiGet({action:'get',year:Y,month:M});
+    if(res.status==='error') throw new Error(res.message);
+    MODE='api'; connMsg=''; parseSheetData(res.roster,res.staffRaw); setBadge(); render();
+  }catch(e){
+    MODE='local'; connMsg='ต่อ Apps Script ไม่ได้: '+(e&&e.message||e)+' (ตรวจว่า Deploy เป็น Web app และ Who has access = Anyone)';
+    setBadge(); render();
+  }finally{ hideLoading(); }
+}
+async function saveRosterApi(){
+  showLoading();
+  try{
+    const res=await apiPost({action:'saveRoster',year:Y,month:M,rows:buildSheetRows()});
+    if(res.status==='error') throw new Error(res.message);
+    showToast(res.message||'บันทึกลง Google Sheets แล้ว ✓');
+  }catch(e){ showInfo('บันทึกไม่สำเร็จ',(e&&e.message||e)+' (ข้อมูลยังเก็บในเครื่องนี้)'); }
+  finally{ hideLoading(); }
+}
+async function saveStaffApi(){
+  showLoading();
+  try{
+    const res=await apiPost({action:'saveStaff',rows:staff.map((n,i)=>[i+1,n,'ใช้งาน'])});
+    if(res.status==='error') throw new Error(res.message);
+    showToast(res.message||'บันทึกรายชื่อแล้ว ✓');
+  }catch(e){ showInfo('บันทึกไม่สำเร็จ',(e&&e.message||e)); }
+  finally{ hideLoading(); render(); }
+}
+function connectApi(){
+  const v=((document.getElementById('apiUrlIn')||{}).value||'').trim();
+  if(v&&!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(v)){
+    showInfo('ลิงก์ไม่ถูกต้อง','ต้องเป็นลิงก์ Web app ที่ลงท้ายด้วย /exec'); return;
+  }
+  API_URL=v; lsSet('homc_api_url',v);
+  if(v) fetchFromApi(); else { MODE='local'; setBadge(); render(); }
+}
+function connBanner(){
+  if(MODE!=='local'||!connMsg) return '';
+  return `<div class="conflict-box" style="margin-bottom:12px">⚠️ ยังไม่ได้ดึงข้อมูลจาก Google Sheets<br>${connMsg}<div style="margin-top:6px;display:flex;gap:8px"><button class="btn btn-outline btn-sm" onclick="fetchFromMcp()">ลองใหม่</button><button class="btn btn-outline btn-sm" onclick="diagnose()">ตรวจสอบตัวเชื่อมต่อ</button></div></div>`;
+}
+async function diagnose(){
+  if(!mcp){ showInfo('ตรวจสอบ', connMsg||'ตัวเชื่อมต่อใช้ไม่ได้'); return; }
+  try{
+    const r=await mcp.listTools();
+    const s=(r.servers||[]).map(x=>x.server+': '+x.authStatus+' ('+x.tools.length+' tools)').join(' | ')||'ไม่พบ connector ใดเลย';
+    showInfo('ตัวเชื่อมต่อที่หน้านี้เห็น', s);
+  }catch(e){ showInfo('ตรวจสอบ', mcpErrMsg(e)+' [รหัส: '+((e&&e.code)||'?')+']'); }
+}
+let SHEET_ID = (lsGet('homc_sheet_id')||DEFAULT_SHEET).replace(/[^A-Za-z0-9_-]/g,'');
+let staff = ["อุษา","จิตรา","พรหมเทพ","อภิสรา","ปัทมพร","อัจฉราพรรณ"];
+let R = {};
+let Y = 2569, M = 11, view = "main";
+let filterIdx = -1, swapTarget = null;
+const now = new Date();
+
+// ===== HELPERS =====
+function dim(y,m){ y=y||Y; m=m||M; return new Date(y-543,m,0).getDate(); }
+function dow(d){ return new Date(Y-543,M-1,d).getDay(); }
+function isWe(d){ const w=dow(d); return w===0||w===6; }
+function thYear(){ return now.getFullYear()+543; }
+function slots(d){ return isWe(d)?SLOT_WE:SLOT_WD; }
+
+function sClass(i){
+  if(i==='S') return 'smc';
+  if(i===''||i===null||i===undefined) return '';
+  return 's'+(i%6);
+}
+function sName(i){
+  if(i==='S') return 'SMC';
+  if(i===''||i===null||i===undefined) return '—';
+  return staff[i]||'?';
+}
+
+// ===== DATA LAYER =====
+function setBadge(){
+  const b=document.getElementById('gasBadge');
+  b.textContent={gas:'● Sheets (GAS)',api:'● Google Sheets',mcp:'● Google Sheets',local:'● local'}[MODE];
+  b.className='gas-badge '+(MODE==='local'?'local':'connected');
+}
+
+function initState(){
+  Y = thYear(); M = now.getMonth()+1;
+  if(typeof google !== 'undefined' && google.script){
+    MODE='gas'; setBadge(); fetchFromGAS(); return;
+  }
+  loadLocal(); hideLoading(); setBadge(); render();
+  if(API_URL){ fetchFromApi(); return; }
+  if(window.claude && window.claude.use){
+    connMsg='กำลังตรวจสอบตัวเชื่อมต่อ Google Sheets...';
+    window.claude.use('mcp').then(ns=>{
+      if(ns){ mcp=ns; connMsg=''; fetchFromMcp(); }
+      else { connMsg='หน้านี้ยังไม่ได้รับสิทธิ์ใช้ Google Sheets — เปิดจากลิงก์ claude.ai/artifact ขณะล็อกอิน แล้วกด Allow (หรือเปิดในแอป Claude)'; render(); }
+    }).catch(e=>{ connMsg='ตัวเชื่อมต่อผิดพลาด: '+(e&&e.message||e); render(); });
+  } else { connMsg='ยังไม่ได้ใส่ลิงก์ Apps Script — ไปที่แท็บ ⚙️ จัดการ แล้ววางลิงก์ Web app (/exec) เพื่อเชื่อม Google Sheets (ตอนนี้ใช้ข้อมูลในเครื่อง)'; render(); }
+}
+
+// ===== Google Sheets via claude.ai connector =====
+const call=(tool,input)=>mcp.callTool(SRV,tool,input,{cache:false});
+function vals(res){
+  const p=res&&res.payload;
+  if(Array.isArray(p)) return p;
+  if(p&&Array.isArray(p.values)) return p.values;
+  return [];
+}
+function mcpErrMsg(e){
+  const c=e&&e.code;
+  if(c==='server_not_connected') return 'ยังไม่ได้เชื่อม Google Sheets — เพิ่มที่ claude.ai Settings → Connectors';
+  if(c==='needs_reauth') return 'สิทธิ์ Google Sheets หมดอายุ — เชื่อมใหม่ที่ claude.ai Settings → Connectors';
+  if(c==='not_in_manifest'||c==='approval_required') return 'ยังไม่ได้อนุญาตให้หน้านี้ใช้ Google Sheets (กดเชื่อมต่อในแท็บจัดการแล้วกด Allow)';
+  if(c==='selection_required') return 'มี Google Sheets หลายบัญชี — เลือกบัญชีใน claude.ai ก่อน';
+  if(c==='blocked_by_policy') return 'องค์กรไม่อนุญาตให้ใช้ Google Sheets';
+  if(c==='server_unavailable') return 'Google Sheets ไม่ตอบสนองชั่วคราว ลองใหม่อีกครั้ง';
+  if(c==='tool_error') return 'เปิดไฟล์ไม่ได้ — ตรวจว่า Spreadsheet ID ถูกต้อง และบัญชี Google ที่เชื่อมไว้มีสิทธิ์แก้ไขไฟล์นี้';
+  return 'เชื่อมต่อ Google Sheets ไม่สำเร็จ'+(e&&e.message?': '+e.message:'');
+}
+
+async function fetchFromMcp(){
+  if(!mcp) return;
+  showLoading();
+  try{
+    const meta=(await call('get_spreadsheet',{spreadsheetId:SHEET_ID,fields:['sheets.properties.title']})).payload||{};
+    sheetTitles=(meta.sheets||[]).map(s=>s&&s.properties&&s.properties.title).filter(Boolean);
+    const rName=`roster_${Y}_${M}`;
+    const staffRows=sheetTitles.includes('staff_list')?vals(await call('get_values',{spreadsheetId:SHEET_ID,range:'staff_list!A2:C200'})):[];
+    const rosterRows=sheetTitles.includes(rName)?vals(await call('get_values',{spreadsheetId:SHEET_ID,range:rName+'!A2:H40'})):[];
+    MODE='mcp';
+    parseSheetData(rosterRows, staffRows);
+    setBadge(); render();
+  }catch(e){
+    MODE='local'; connMsg=mcpErrMsg(e)+' [รหัส: '+((e&&e.code)||'?')+']'; setBadge(); render();
+  }finally{ hideLoading(); }
+}
+
+async function ensureSheet(name){
+  if(sheetTitles.includes(name)) return;
+  await call('update_spreadsheet',{spreadsheetId:SHEET_ID,requests:[{addSheet:{properties:{title:name}}}]});
+  sheetTitles.push(name);
+}
+
+function writeErr(e){
+  const maybe=(e&&(e.code==='server_unavailable'||e.code==='upstream_error'))?' (อาจบันทึกไปแล้ว กด "ดึงจาก Sheets" เพื่อตรวจ)':'';
+  showInfo('บันทึกไม่สำเร็จ', mcpErrMsg(e)+maybe);
+}
+
+async function saveRosterMcp(){
+  showLoading();
+  try{
+    const name=`roster_${Y}_${M}`;
+    await ensureSheet(name);
+    const rows=[HEADERS,...buildSheetRows()];
+    await call('update_values',{spreadsheetId:SHEET_ID,range:`${name}!A1:H${rows.length}`,values:rows});
+    showToast('บันทึกลง Google Sheets แล้ว ✓');
+  }catch(e){ writeErr(e); }
+  finally{ hideLoading(); }
+}
+
+async function saveStaffMcp(){
+  showLoading();
+  try{
+    await ensureSheet('staff_list');
+    await call('batch_clear_values',{spreadsheetId:SHEET_ID,ranges:['staff_list!A2:C200']});
+    const rows=[["ลำดับ","ชื่อ-นามสกุล","สถานะ"],...staff.map((n,i)=>[i+1,n,'ใช้งาน'])];
+    await call('update_values',{spreadsheetId:SHEET_ID,range:`staff_list!A1:C${rows.length}`,values:rows});
+    showToast('บันทึกรายชื่อลง Google Sheets แล้ว ✓');
+  }catch(e){ writeErr(e); }
+  finally{ hideLoading(); render(); }
+}
+
+function connectSheet(){
+  const raw=(document.getElementById('sheetIdIn')||{}).value||'';
+  const m=raw.match(/\/d\/([A-Za-z0-9_-]+)/);
+  const id=(m?m[1]:raw).replace(/[^A-Za-z0-9_-]/g,'');
+  if(!id){ showInfo('แจ้งเตือน','กรุณาใส่ Spreadsheet ID หรือลิงก์'); return; }
+  SHEET_ID=id; lsSet('homc_sheet_id',id);
+  if(MODE==='gas'){ showInfo('โหมด GAS','เวอร์ชัน GAS ใช้ชีตที่ผูกกับสคริปต์อยู่แล้ว'); return; }
+  if(!mcp){ showInfo('ใช้ไม่ได้ในหน้านี้','เปิดหน้านี้บน claude.ai เพื่อเชื่อม Google Sheets'); return; }
+  fetchFromMcp();
+}
+
+function fetchFromGAS(){
+  showLoading();
+  google.script.run
+    .withSuccessHandler(function(res){
+      hideLoading();
+      if(res.status==='error'){ showInfo('ข้อผิดพลาด',res.message); return; }
+      parseSheetData(res.roster, res.staffRaw);
+      render();
+    })
+    .withFailureHandler(function(err){
+      hideLoading();
+      showInfo('เชื่อมต่อไม่ได้', err.message||err.toString());
+    })
+    .getRosterData(Y, M);
+}
+
+function parseSheetData(rosterRows, staffRows){
+  if(staffRows && staffRows.length>0){
+    staff = staffRows.map(r=>String(r[1]||'').trim()).filter(Boolean);
+  }
+  R = {};
+  const total = dim();
+  for(let d=1;d<=total;d++) R[d]=['','','',''];
+  rosterRows.forEach(row=>{
+    const d = parseInt(row[0]);
+    if(!d||d<1||d>total) return;
+    const we = isWe(d);
+    const nm = v=>{ const n=String(v||'').trim(); if(!n) return ''; const i=staff.indexOf(n); return i>=0?i:''; };
+    if(we){
+      R[d]=[String(row[2]||'').trim()==='SMC'?'S':'', nm(row[5]), nm(row[6]), nm(row[7])];
+    } else {
+      R[d]=[nm(row[2]), nm(row[3]), nm(row[4]), nm(row[7])];
+    }
+  });
+}
+
+function buildSheetRows(){
+  const total = dim();
+  const rows = [];
+  for(let d=1;d<=total;d++){
+    const we = isWe(d);
+    const r = R[d]||['','','',''];
+    const nm = v=>{ if(v===''||v===null||v===undefined) return ''; if(v==='S') return 'SMC'; return staff[v]||''; };
+    if(we){
+      rows.push([d, DN[dow(d)], r[0]==='S'?'SMC':'','','', nm(r[1]), nm(r[2]), nm(r[3])]);
+    } else {
+      rows.push([d, DN[dow(d)], nm(r[0]), nm(r[1]), nm(r[2]),'','', nm(r[3])]);
+    }
+  }
+  return rows;
+}
+
+function saveRoster(){
+  lsSet('homc_'+Y+'_'+M, JSON.stringify(R));
+  if(MODE==='mcp'){ saveRosterMcp(); return; }
+  if(MODE==='api'){ saveRosterApi(); return; }
+  if(MODE==='gas'){
+    showLoading();
+    google.script.run
+      .withSuccessHandler(function(res){
+        hideLoading();
+        if(res.status==='error'){ showInfo('บันทึกไม่สำเร็จ',res.message); return; }
+        showToast(res.message||'บันทึกสำเร็จ ✓');
+      })
+      .withFailureHandler(function(err){
+        hideLoading();
+        showInfo('ข้อผิดพลาด',err.message||err.toString());
+      })
+      .saveRosterData(Y, M, buildSheetRows());
+  } else {
+    showToast('บันทึกสำเร็จ (local) ✓');
+  }
+}
+
+function saveStaff(newStaff){
+  staff = newStaff;
+  lsSet('homc_staff', JSON.stringify(staff));
+  if(MODE==='mcp'){ saveStaffMcp(); return; }
+  if(MODE==='api'){ saveStaffApi(); return; }
+  if(MODE==='gas'){
+    showLoading();
+    const rows = staff.map((n,i)=>[ i+1, n, 'ใช้งาน' ]);
+    google.script.run
+      .withSuccessHandler(function(res){
+        hideLoading();
+        if(res.status==='error'){ showInfo('บันทึกไม่สำเร็จ',res.message); return; }
+        showToast(res.message||'บันทึกรายชื่อสำเร็จ ✓');
+        render();
+      })
+      .withFailureHandler(function(err){
+        hideLoading();
+        showInfo('ข้อผิดพลาด',err.message||err.toString());
+      })
+      .saveStaffData(rows);
+  } else {
+    showToast('บันทึกรายชื่อสำเร็จ (local) ✓');
+    render();
+  }
+}
+
+function loadLocal(){
+  const s = lsGet('homc_staff');
+  if(s) try{ staff=JSON.parse(s); }catch(e){}
+  const r = lsGet('homc_'+Y+'_'+M);
+  if(r) try{ R=JSON.parse(r); }catch(e){}
+  else { R={}; const t=dim(); for(let d=1;d<=t;d++) R[d]=['','','','']; }
+}
+
+function changeMonth(){
+  R={};
+  if(MODE==='gas'){ fetchFromGAS(); }
+  else if(MODE==='api'){ fetchFromApi(); }
+  else if(MODE==='mcp'){ fetchFromMcp(); }
+  else { loadLocal(); render(); }
+}
+
+// ===== CONFLICT CHECK =====
+function checkConflicts(){
+  const warns=[]; const total=dim();
+  for(let d=1;d<total;d++){
+    if(!isWe(d)){ // weekday: slot3=16-08
+      const night=R[d]&&R[d][3];
+      if(night!==''&&night!==null&&night!==undefined){
+        const nextSlots=slots(d+1);
+        for(let k=0;k<3;k++){
+          if(R[d+1]&&R[d+1][k]===night){
+            warns.push(`วันที่ ${d} ${sName(night)} เวร 16-08 ต่อเนื่องกับวันที่ ${d+1} ${nextSlots[k]}`);
+          }
+        }
+      }
+    }
+  }
+  return warns;
+}
+
+// ===== RENDER ENGINE =====
+function render(){
+  document.getElementById('hdrSub').textContent = `${M}/${Y}`;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.v===view));
+  const el=document.getElementById('main');
+  if(view==='main') el.innerHTML=buildMain();
+  else if(view==='swap') el.innerHTML=buildSwap();
+  else if(view==='report') el.innerHTML=buildReport();
+  else if(view==='admin') el.innerHTML=buildAdmin();
+  el.innerHTML=connBanner()+el.innerHTML;
+  attachAdminEvents();
+}
+
+function monthBar(showSave){
+  const years=[]; for(let yy=2567;yy<=2572;yy++) years.push(yy);
+  const months=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  return `<div class="month-bar">
+    <select id="selY" onchange="Y=+this.value;changeMonth()">${years.map(y=>`<option${y===Y?' selected':''}>${y}</option>`).join('')}</select>
+    <select id="selM" onchange="M=+this.value;changeMonth()">${months.map((n,i)=>`<option value="${i+1}"${i+1===M?' selected':''}>${n}</option>`).join('')}</select>
+    ${showSave?`<button class="btn btn-primary btn-sm" onclick="saveRoster()">💾 บันทึก</button>`:''}
+    ${MODE==='mcp'?`<button class="btn btn-outline btn-sm" onclick="fetchFromMcp()">🔄 ดึงจาก Sheets</button>`:''}
+    <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ พิมพ์</button>
+  </div>`;
+}
+
+function buildMain(){
+  const total=dim(); const warns=checkConflicts();
+  let html=monthBar(true);
+  if(warns.length>0) html+=`<div class="conflict-box">⚠️ พบความขัดแย้ง:<br>${warns.join('<br>')}</div>`;
+
+  html+=`<div class="tbl-wrap"><table>
+  <thead><tr><th>วัน</th><th>ที่</th>`;
+  const whSlots=['เที่ยง','07-08①','07-08②','16-08'];
+  const weSlots=['SMC','07-16','08-16','16-08'];
+  for(let k=0;k<4;k++) html+=`<th>${whSlots[k]}</th>`;
+  html+=`</tr></thead><tbody>`;
+
+  for(let d=1;d<=total;d++){
+    const we=isWe(d); const isToday=(now.getFullYear()===Y-543&&now.getMonth()===M-1&&now.getDate()===d);
+    const r=R[d]||['','','',''];
+    html+=`<tr class="${we?'weekend':''} ${isToday?'today':''}">
+      <td style="color:var(--muted);font-size:.72rem">${DN[dow(d)]}</td>
+      <td style="font-weight:600">${d}</td>`;
+    for(let k=0;k<4;k++){
+      const v=r[k]; const cls=sClass(v); const nm=sName(v);
+      const show=(we&&k===0)?`<span class="badge ${v==='S'?'smc':'empty'}">${v==='S'?'SMC':'—'}</span>`
+        :`<span class="badge ${cls||'empty'}">${cls?nm:'—'}</span>`;
+      html+=`<td>${show}</td>`;
+    }
+    html+=`</tr>`;
+  }
+  html+=`</tbody></table></div>`;
+
+  // Legend chips
+  html+=`<div class="chips-wrap">`;
+  staff.forEach((n,i)=>html+=`<span class="chip s${i%6}">${n}</span>`);
+  html+=`</div>`;
+  return html;
+}
+
+function buildSwap(){
+  const total=dim(); const warns=checkConflicts();
+  let html=monthBar(true);
+  if(warns.length>0) html+=`<div class="conflict-box">⚠️ ${warns.join('<br>')}</div>`;
+  html+=`<p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">แตะชื่อเพื่อเปลี่ยนเจ้าหน้าที่</p>`;
+  html+=`<div class="tbl-wrap"><table><thead><tr><th>วัน</th><th>ที่</th>`;
+  const whLabels=['เที่ยง','07-08①','07-08②','16-08'];
+  for(let k=0;k<4;k++) html+=`<th>${whLabels[k]}</th>`;
+  html+=`</tr></thead><tbody>`;
+
+  for(let d=1;d<=total;d++){
+    const we=isWe(d); const isToday=(now.getFullYear()===Y-543&&now.getMonth()===M-1&&now.getDate()===d);
+    const r=R[d]||['','','',''];
+    html+=`<tr class="${we?'weekend':''} ${isToday?'today':''}">
+      <td style="color:var(--muted);font-size:.72rem">${DN[dow(d)]}</td>
+      <td style="font-weight:600">${d}</td>`;
+    for(let k=0;k<4;k++){
+      const v=r[k]; const cls=sClass(v); const nm=sName(v);
+      const isSMCSlot=(we&&k===0);
+      if(isSMCSlot){
+        html+=`<td><span class="badge ${v==='S'?'smc':'empty'}" onclick="openPicker(${d},${k})">${v==='S'?'SMC':'—'}</span></td>`;
+      } else {
+        html+=`<td><span class="badge ${cls||'empty'}" onclick="openPicker(${d},${k})">${cls?nm:'—'}</span></td>`;
+      }
+    }
+    html+=`</tr>`;
+  }
+  html+=`</tbody></table></div>`;
+  html+=`<div class="chips-wrap">`;
+  staff.forEach((n,i)=>html+=`<span class="chip s${i%6}">${n}</span>`);
+  html+=`</div>`;
+  return html;
+}
+
+function buildReport(){
+  const total=dim();
+  const counts={}; staff.forEach((_,i)=>counts[i]=0);
+  const slotCounts={}; staff.forEach((_,i)=>slotCounts[i]={0:0,1:0,2:0,3:0});
+  let totalFilled=0,smcCount=0;
+
+  for(let d=1;d<=total;d++){
+    const r=R[d]||[];
+    for(let k=0;k<4;k++){
+      const v=r[k];
+      if(v==='S'){ smcCount++; totalFilled++; }
+      else if(v!==''&&v!==null&&v!==undefined){ counts[v]=(counts[v]||0)+1; slotCounts[v][k]=(slotCounts[v][k]||0)+1; totalFilled++; }
+    }
+  }
+
+  const maxCount=Math.max(1,...Object.values(counts));
+  const slotLabels=['เที่ยง','07-08①','07-08②','16-08'];
+  const monthNames=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  const bgColors=['var(--s0bg)','var(--s1bg)','var(--s2bg)','var(--s3bg)','var(--s4bg)','var(--s5bg)'];
+
+  let html=`<div style="margin-bottom:12px;font-size:.9rem;font-weight:700">รายงานเดือน ${monthNames[M-1]} ${Y}</div>`;
+  html+=`<div class="stat-row">
+    <div class="stat-tile"><div class="stat-num">${total}</div><div class="stat-label">วันทั้งหมด</div></div>
+    <div class="stat-tile"><div class="stat-num">${totalFilled}</div><div class="stat-label">ช่องที่มีเวร</div></div>
+    <div class="stat-tile"><div class="stat-num">${smcCount}</div><div class="stat-label">เวร SMC</div></div>
+    <div class="stat-tile"><div class="stat-num">${staff.length}</div><div class="stat-label">เจ้าหน้าที่</div></div>
+  </div>`;
+
+  html+=`<div class="chart-wrap"><div class="chart-title">จำนวนเวรแต่ละคน</div>`;
+  staff.forEach((n,i)=>{
+    const c=counts[i]||0; const pct=Math.round(c/maxCount*100);
+    html+=`<div class="bar-row">
+      <div class="bar-name">${n}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${bgColors[i%6]}"></div></div>
+      <div class="bar-val">${c}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  html+=`<div class="report-tbl-wrap"><table class="report-tbl">
+    <thead><tr><th>ชื่อ</th>${slotLabels.map(s=>`<th>${s}</th>`).join('')}<th>รวม</th></tr></thead>
+    <tbody>`;
+  staff.forEach((n,i)=>{
+    const sc=slotCounts[i]||{0:0,1:0,2:0,3:0};
+    const total=sc[0]+sc[1]+sc[2]+sc[3];
+    html+=`<tr><td style="text-align:left"><span class="badge s${i%6}">${n}</span></td>
+      ${[0,1,2,3].map(k=>`<td>${sc[k]||0}</td>`).join('')}
+      <td style="font-weight:700">${total}</td></tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  return html;
+}
+
+function buildAdmin(){
+  const total=dim();
+  const slotLabels=d=>isWe(d)?['SMC (√/×)','07-16','08-16','16-08']:['เวรเที่ยง','07-08(1)','07-08(2)','16-08'];
+
+  const modeText={gas:'เชื่อมผ่าน Google Apps Script',api:'เชื่อม Google Sheets แล้ว ✓',mcp:'เชื่อม Google Sheets แล้ว ✓',local:'ยังไม่เชื่อม (บันทึกในเครื่องนี้เท่านั้น)'}[MODE];
+  let html=`<div class="admin-section">
+    <div class="admin-title">เชื่อมต่อ Google Sheets (ลิงก์ Apps Script Web app)</div>
+    <div class="admin-row"><label>ลิงก์ Web app ที่ลงท้ายด้วย /exec</label>
+      <input id="apiUrlIn" value="${API_URL}" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div style="display:flex;gap:8px;margin:8px 0 14px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="connectApi()">🔗 เชื่อมต่อ / ดึงข้อมูล</button>
+      <span style="font-size:.78rem;color:var(--muted)">สถานะ: ${modeText}</span>
+    </div>
+    <div class="admin-title" style="margin-top:6px">ทางเลือกในแอป Claude: เชื่อมผ่านตัวเชื่อมต่อ Google Sheets</div>
+    <div class="admin-row"><label>Spreadsheet ID หรือลิงก์ Google Sheets</label>
+      <input id="sheetIdIn" value="${SHEET_ID}"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="connectSheet()">🔗 เชื่อมต่อ / ดึงข้อมูล</button>
+      <span style="font-size:.78rem;color:var(--muted)">สถานะ: ${modeText}</span>
+    </div>
+  </div>`;
+  html+=`<div class="admin-section">
+    <div class="admin-title">แก้ไขตารางเวรรายวัน</div>`;
+  html+=`<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <select id="adminDay" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-size:.85rem">`;
+  for(let d=1;d<=total;d++){
+    html+=`<option value="${d}">${d} ${DN[dow(d)]}${isWe(d)?' (ห/อ)':''}</option>`;
+  }
+  html+=`</select></div>`;
+  html+=`<div id="adminSlots" class="admin-grid"></div>
+    <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="saveAdminDay()">💾 บันทึกวันนี้</button>
+  </div>`;
+
+  html+=`<div class="admin-section">
+    <div class="admin-title">จัดการรายชื่อเจ้าหน้าที่</div>
+    <div id="staffListEd">`;
+  staff.forEach((n,i)=>{
+    html+=`<div class="staff-list-row" id="sr_${i}">
+      <span class="badge s${i%6}" style="min-width:28px">${i+1}</span>
+      <input type="text" value="${n}" id="sn_${i}" placeholder="ชื่อ">
+      <button class="btn btn-outline btn-sm" onclick="removeStaffRow(${i})">✕</button>
+    </div>`;
+  });
+  html+=`</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline btn-sm" onclick="addStaffRow()">+ เพิ่มชื่อ</button>
+      <button class="btn btn-primary btn-sm" onclick="saveStaffAdmin()">💾 บันทึกรายชื่อ</button>
+    </div>
+  </div>`;
+  return html;
+}
+
+function attachAdminEvents(){
+  const sel=document.getElementById('adminDay');
+  if(!sel) return;
+  renderAdminSlots(+sel.value);
+  sel.addEventListener('change',function(){ renderAdminSlots(+this.value); });
+}
+
+function renderAdminSlots(d){
+  const el=document.getElementById('adminSlots'); if(!el) return;
+  const we=isWe(d); const r=R[d]||['','','',''];
+  const labels=we?['SMC (√/×)','07-16','08-16','16-08']:['เวรเที่ยง','07-08(1)','07-08(2)','16-08'];
+  let html='';
+  for(let k=0;k<4;k++){
+    const isSMC=(we&&k===0);
+    if(isSMC){
+      html+=`<div class="admin-row"><label>${labels[k]}</label>
+        <select id="as_${k}">
+          <option value="">— ว่าง —</option>
+          <option value="S"${r[k]==='S'?' selected':''}>SMC</option>
+        </select></div>`;
+    } else {
+      html+=`<div class="admin-row"><label>${labels[k]}</label>
+        <select id="as_${k}">
+          <option value="">— ว่าง —</option>
+          ${staff.map((n,i)=>`<option value="${i}"${r[k]===i?' selected':''||String(r[k])===String(i)?' selected':''}>${n}</option>`).join('')}
+        </select></div>`;
+    }
+  }
+  el.innerHTML=html;
+}
+
+function saveAdminDay(){
+  const sel=document.getElementById('adminDay'); if(!sel) return;
+  const d=+sel.value;
+  const we=isWe(d); R[d]=R[d]||['','','',''];
+  for(let k=0;k<4;k++){
+    const s=document.getElementById('as_'+k); if(!s) continue;
+    const v=s.value;
+    if(we&&k===0){ R[d][k]=v==='S'?'S':''; }
+    else{ R[d][k]=v===''?'':+v; }
+  }
+  saveRoster();
+  render();
+}
+
+function addStaffRow(){
+  const ed=document.getElementById('staffListEd'); if(!ed) return;
+  const i=ed.querySelectorAll('.staff-list-row').length;
+  const row=document.createElement('div');
+  row.className='staff-list-row'; row.id=`sr_${i}`;
+  row.innerHTML=`<span class="badge s${i%6}" style="min-width:28px">${i+1}</span>
+    <input type="text" id="sn_${i}" placeholder="ชื่อ">
+    <button class="btn btn-outline btn-sm" onclick="removeStaffRow(${i})">✕</button>`;
+  ed.appendChild(row);
+}
+
+function removeStaffRow(i){
+  const row=document.getElementById('sr_'+i); if(row) row.remove();
+}
+
+function saveStaffAdmin(){
+  const inputs=document.querySelectorAll('[id^="sn_"]');
+  const names=[]; inputs.forEach(inp=>{ const n=inp.value.trim(); if(n) names.push(n); });
+  if(names.length===0){ showInfo('แจ้งเตือน','กรุณาใส่ชื่ออย่างน้อย 1 คน'); return; }
+  saveStaff(names);
+}
+
+// ===== PICKER MODAL =====
+let _pickerD=null, _pickerK=null;
+function openPicker(d,k){
+  _pickerD=d; _pickerK=k;
+  const we=isWe(d); const labels=(we?SLOT_WE:SLOT_WD);
+  document.getElementById('pickerTitle').textContent=`วันที่ ${d} — ${labels[k]}`;
+  const list=document.getElementById('pickerList');
+  const isSMCSlot=(we&&k===0);
+  let html=`<div class="pick-item none" data-pick="" onclick="pickStaff('')">— ว่าง —</div>`;
+  if(isSMCSlot){
+    html+=`<div class="pick-item" data-pick="S" onclick="pickStaff('S')"><span class="badge smc">SMC</span></div>`;
+  } else {
+    staff.forEach((n,i)=>{
+      html+=`<div class="pick-item" data-pick="${i}" onclick="pickStaff(${i})"><span class="badge s${i%6}">${n}</span></div>`;
+    });
+  }
+  list.innerHTML=html;
+  document.getElementById('pickerOverlay').style.display='flex';
+}
+
+function pickStaff(val){
+  if(_pickerD!==null&&_pickerK!==null){
+    if(!R[_pickerD]) R[_pickerD]=['','','',''];
+    R[_pickerD][_pickerK]=val;
+  }
+  closePicker();
+  render();
+}
+
+function closePicker(e){
+  if(e&&e.target!==document.getElementById('pickerOverlay')) return;
+  document.getElementById('pickerOverlay').style.display='none';
+  _pickerD=null; _pickerK=null;
+}
+
+// ===== UI HELPERS =====
+function showLoading(){ document.getElementById('loading').style.display='flex'; }
+function hideLoading(){ document.getElementById('loading').style.display='none'; }
+
+function showToast(msg){
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2800);
+}
+
+function showInfo(title,msg){
+  document.getElementById('infoTitle').textContent=title;
+  document.getElementById('infoMsg').textContent=msg;
+  document.getElementById('infoOverlay').style.display='flex';
+}
+function closeInfo(){ document.getElementById('infoOverlay').style.display='none'; }
+
+// ===== NAV =====
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    view=this.dataset.v; render();
+  });
+});
+
+// ===== BOOT =====
+initState();
+</script>
+</body>
+</html>
