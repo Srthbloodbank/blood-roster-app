@@ -39,7 +39,9 @@ jobs:
       - name: Add HOMC roster page
         run: |
           mkdir -p _site/homc
-          cp homc/index.html _site/homc/
+          cp homc/index.html homc/manifest.json homc/sw.js \
+             homc/icon-192.png homc/icon-512.png homc/icon-maskable-512.png \
+             homc/apple-touch-icon.png _site/homc/
 
       - name: Configure Pages (เปิด Pages ให้อัตโนมัติ)
         uses: actions/configure-pages@v5
