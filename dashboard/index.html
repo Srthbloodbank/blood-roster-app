@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>แดชบอร์ดผู้บริหาร — ธนาคารเลือด</title>
+<meta name="description" content="แดชบอร์ดสรุปภาพรวมงานธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี สำหรับผู้บริหาร">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dashboard BB">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f1f5f9; --card: #ffffff; --ink: #0f172a; --mute: #64748b;
+  --line: #e2e8f0; --acc: #a4162b; --accink: #fff; --ok: #16a34a;
+  --okbg: #dcfce7; --warn: #d97706; --warnbg: #fef3c7; --info: #2563eb;
+  --infobg: #dbeafe; --navy: #0f172a; --navy2: #1e293b;
+  --kpi1: #ef4444; --kpi2: #3b82f6; --kpi3: #10b981; --kpi4: #f59e0b;
+  --grad-top: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,.1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #020617; --card: #0f172a; --ink: #e2e8f0; --mute: #94a3b8;
+    --line: #1e293b; --acc: #fb7185; --accink: #1c0a0e; --ok: #4ade80;
+    --okbg: #052e16; --warn: #fbbf24; --warnbg: #422006; --info: #60a5fa;
+    --infobg: #172554; --navy: #020617; --navy2: #0f172a;
+    --grad-top: linear-gradient(135deg, #020617 0%, #0c1e3a 50%, #020617 100%);
+    --shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.25);
+    --shadow-lg: 0 4px 24px rgba(0,0,0,.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #020617; --card: #0f172a; --ink: #e2e8f0; --mute: #94a3b8;
+  --line: #1e293b; --acc: #fb7185; --accink: #1c0a0e; --ok: #4ade80;
+  --okbg: #052e16; --warn: #fbbf24; --warnbg: #422006; --info: #60a5fa;
+  --infobg: #172554; --navy: #020617; --navy2: #0f172a;
+  --grad-top: linear-gradient(135deg, #020617 0%, #0c1e3a 50%, #020617 100%);
+  --shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.25);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,.4);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0 }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 "IBM Plex Sans Thai", system-ui, sans-serif; min-height: 100dvh }
+
+/* Header */
+.topbar { background: var(--grad-top); color: #fff; padding: 20px 16px 18px; border-bottom: 3px solid var(--acc) }
+.topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 14px }
+.topbar-icon { flex: none; width: 48px; height: 48px; background: rgba(255,255,255,.12); border-radius: 14px; display: grid; place-items: center }
+.topbar-icon svg { width: 28px; height: 28px }
+.topbar h1 { font-size: 20px; font-weight: 800; line-height: 1.25 }
+.topbar .sub { color: #94a3b8; font-size: 13px; font-weight: 500 }
+.topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center }
+.topbar-right .clock { font-size: 14px; font-weight: 600; color: #94a3b8; font-variant-numeric: tabular-nums }
+.btn-icon { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 10px; width: 40px; height: 40px; cursor: pointer; font-size: 16px; display: grid; place-items: center }
+.btn-icon:hover { background: rgba(255,255,255,.2) }
+
+/* Nav */
+.nav { background: var(--card); border-bottom: 1px solid var(--line); overflow-x: auto; position: sticky; top: 0; z-index: 10 }
+.nav-inner { max-width: 1200px; margin: 0 auto; display: flex; padding: 0 8px }
+.nav button { border: 0; background: none; color: var(--mute); font: inherit; font-weight: 600; font-size: 14px; padding: 14px 16px; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px }
+.nav button.on { color: var(--acc); border-color: var(--acc); font-weight: 700 }
+.nav button:hover:not(.on) { color: var(--ink) }
+
+/* Main */
+.main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px }
+
+/* KPI Row */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px }
+.kpi { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 16px; box-shadow: var(--shadow); position: relative; overflow: hidden }
+.kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px }
+.kpi:nth-child(1)::before { background: var(--kpi1) }
+.kpi:nth-child(2)::before { background: var(--kpi2) }
+.kpi:nth-child(3)::before { background: var(--kpi3) }
+.kpi:nth-child(4)::before { background: var(--kpi4) }
+.kpi-label { font-size: 13px; color: var(--mute); font-weight: 600; margin-bottom: 6px }
+.kpi-val { font-size: 32px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums }
+.kpi:nth-child(1) .kpi-val { color: var(--kpi1) }
+.kpi:nth-child(2) .kpi-val { color: var(--kpi2) }
+.kpi:nth-child(3) .kpi-val { color: var(--kpi3) }
+.kpi:nth-child(4) .kpi-val { color: var(--kpi4) }
+.kpi-sub { font-size: 12px; color: var(--mute); margin-top: 4px }
+
+/* Cards */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 18px }
+.card-h { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--line) }
+.card-h h2 { font-size: 16px; font-weight: 700; flex: 1 }
+.card-h .dot { width: 8px; height: 24px; border-radius: 4px; flex: none }
+.card-h .badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap }
+.card-body { padding: 16px 18px }
+.card-link { display: block; padding: 12px 18px; border-top: 1px solid var(--line); text-align: center; color: var(--info); font-weight: 600; font-size: 14px; text-decoration: none; cursor: pointer }
+.card-link:hover { background: var(--infobg) }
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px }
+
+/* Today bar */
+.today-bar { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--info); border-radius: 16px; padding: 18px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 18px; box-shadow: var(--shadow-lg) }
+.today-bar .tdate { text-align: center; flex: none; width: 64px }
+.today-bar .tdate b { display: block; font-size: 36px; font-weight: 800; color: var(--info); line-height: 1 }
+.today-bar .tdate span { font-size: 12px; color: var(--mute) }
+.today-bar .tinfo { flex: 1 }
+.today-bar .tinfo h3 { font-size: 17px; font-weight: 700; margin-bottom: 2px }
+.today-bar .tinfo p { font-size: 14px; color: var(--mute); line-height: 1.5 }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; font-size: 14px }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle }
+th { font-size: 12px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .5px; background: color-mix(in srgb, var(--card) 60%, var(--bg)) }
+tbody tr:last-child td { border-bottom: 0 }
+tbody tr:hover { background: color-mix(in srgb, var(--info) 5%, var(--card)) }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600 }
+.tag-ok { background: var(--okbg); color: var(--ok) }
+.tag-warn { background: var(--warnbg); color: var(--warn) }
+.tag-info { background: var(--infobg); color: var(--info) }
+
+/* Attendance */
+.att-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.att-row:last-child { border-bottom: 0 }
+.att-avatar { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 14px; color: #fff; flex: none }
+.att-name { flex: 1 }
+.att-name b { display: block; font-size: 14px }
+.att-name span { font-size: 12px; color: var(--mute) }
+.att-status { flex: none; font-size: 13px; font-weight: 600 }
+
+/* Supply bars */
+.supply-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line) }
+.supply-item:last-child { border-bottom: 0 }
+.supply-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; flex: none }
+.supply-info { flex: 1 }
+.supply-info b { display: block; font-size: 14px; margin-bottom: 4px }
+.supply-bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden }
+.supply-bar div { height: 100%; border-radius: 4px; transition: width .6s ease }
+.supply-val { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; flex: none; min-width: 48px; text-align: right }
+
+/* Chart bars */
+.hbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px }
+.hbar-label { width: 90px; font-size: 13px; font-weight: 500; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.hbar-track { flex: 1; height: 24px; background: var(--line); border-radius: 6px; overflow: hidden; position: relative }
+.hbar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding: 0 8px; font-size: 12px; font-weight: 700; color: #fff; min-width: fit-content; transition: width .8s ease }
+.hbar-val { flex: none; width: 36px; font-size: 13px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums }
+
+/* Quick links */
+.quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px }
+.quick-link { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 14px; text-align: center; cursor: pointer; transition: transform .15s, box-shadow .15s }
+.quick-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg) }
+.quick-link .ql-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 26px }
+
+/* Section heading */
+.sec-head { font-size: 17px; font-weight: 700; margin: 28px 0 14px; padding-left: 12px; border-left: 4px solid var(--acc) }
+.sec-head:first-child { margin-top: 0 }
+
+/* Empty */
+.empty { text-align: center; padding: 28px 16px; color: var(--mute); font-size: 14px }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) }
+  .grid-2, .grid-3 { grid-template-columns: 1fr }
+  .quick-grid { grid-template-columns: repeat(2, 1fr) }
+}
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px }
+  .kpi { padding: 14px 12px }
+  .kpi-val { font-size: 26px }
+  .topbar h1 { font-size: 17px }
+  .today-bar { flex-direction: column; text-align: center; gap: 10px }
+  .quick-grid { grid-template-columns: 1fr 1fr }
+  .hbar-label { width: 60px; font-size: 12px }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2"/></svg>
+    </div>
+    <div>
+      <h1>แดชบอร์ดผู้บริหาร</h1>
+      <div class="sub">ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี</div>
+    </div>
+    <div class="topbar-right">
+      <div class="clock" id="clock"></div>
+      <button class="btn-icon" id="themeBtn" type="button" title="เปลี่ยนโหมดสี">🌓</button>
+      <button class="btn-icon" id="refreshBtn" type="button" title="รีเฟรชข้อมูล">🔄</button>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-inner" id="tabs">
+    <button class="on" data-t="overview">📊 ภาพรวม</button>
+    <button data-t="roster">📋 เวรแพทย์ออกหน่วย</button>
+    <button data-t="supply">📦 ระบบเบิกของ</button>
+    <button data-t="attendance">✅ ลงชื่ออยู่เวร</button>
+  </div>
+</div>
+
+<div class="main" id="app"></div>
+
+<script>
+var M=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+var MS=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+var W=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+var tab="overview";
+
+var DOCS=[
+  {code:"D01",name:"นพ.ภูริณัฐ ธีรวิศรุต",tel:"*9279"},
+  {code:"D02",name:"พญ.ดวงกมล บุญสงค์",tel:"*9289"},
+  {code:"D03",name:"นพ.กิตติธัช วิสาละ",tel:"*9288"},
+  {code:"D04",name:"นพ.เจตนิพัทธ์ ปัญญา",tel:"*9057"},
+  {code:"D05",name:"นพ.ธัชพล วรานันตกุล",tel:"*9278"},
+  {code:"D06",name:"พญ.ปิ่นรดา กิ่งโพธิ์ตัน",tel:"*9062"},
+  {code:"D07",name:"พญ.มนัชญา มาลารัตน์",tel:"*9061"},
+  {code:"D08",name:"พญ.ทิชา สุวีรานุวัฒน์",tel:"*9254"},
+  {code:"D09",name:"พญ.ณัชชา เจนกิจวัฒนาเลิศ",tel:"*9282"},
+  {code:"D10",name:"พญ.พชรภา เจียรพันธุ์",tel:"*9250"},
+  {code:"D11",name:"พญ.ปุญญิศา ทวี",tel:"*9066"},
+  {code:"D12",name:"พญ.พชรมน วิเศษคณากุล",tel:"*9280"},
+  {code:"D13",name:"นพ.น่านเจ้า กันทะมัง",tel:"*9290"},
+  {code:"D14",name:"พญ.วิศรุตา แก้วหัวไทร",tel:"*9286"},
+  {code:"D15",name:"พญ.กษมา บุญนำ",tel:"*9077"},
+  {code:"D16",name:"นพ.ศุภชัย เชิงดี",tel:"*9251"},
+  {code:"D17",name:"พญ.ศุภิสรา กรดแก้ว",tel:"*9260"},
+  {code:"D18",name:"พญ.ญาณิศา สาเมือง",tel:"*9292"},
+  {code:"D19",name:"นพ.กันต์ธีร์ ทองสีพราย",tel:"*9014"},
+  {code:"D20",name:"พญ.ศุภสุดา ยิ่งยง",tel:"*9017"},
+  {code:"D21",name:"พญ.ธนภรณ์ ชาคโรทัย",tel:"*9015"},
+  {code:"D22",name:"ธันย์ชนก บรรฌราช",tel:"*9258"},
+  {code:"D23",name:"นพ.ออมทรัพย์ ลีลาประเสริฐศิลป์",tel:"*9287"},
+  {code:"D24",name:"ณัฐมน โงกเขา",tel:"*9253"},
+  {code:"D25",name:"ธนธรณ์ วัชราวิวัฒน์",tel:"*9283"}
+];
+
+var EVENTS=[
+  {date:"2026-10-05",n:0,codes:[],place:"-",time:"8.30 น."},
+  {date:"2026-10-06",n:66,codes:["D01"],place:"รพ.สต.คลองสระ",time:"8.30 น."},
+  {date:"2026-10-07",n:67,codes:["D02"],place:"ศาลเยาวชน",time:"8.30 น."},
+  {date:"2026-10-08",n:64,codes:["D03"],place:"ศูนย์การค้าโคลีเซี่ยมสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-10-09",n:19,codes:["D04"],place:"บริษัทซีพีแรม",time:"8.30 น."},
+  {date:"2026-10-12",n:3,codes:["D05"],place:"มหาวิทยาลัยราชภัฏสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-10-14",n:43,codes:["D06"],place:"ศูนย์ฝึกอบรมตำรวจภูธรภาค 8",time:"8.30 น."},
+  {date:"2026-10-15",n:47,codes:["D07"],place:"ห้างเซ็นทรัลพลาซ่า",time:"8.30 น."},
+  {date:"2026-10-16",n:49,codes:["D08"],place:"บริษัทสิริสินสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-10-19",n:12,codes:["D09"],place:"อำเภอท่าฉาง",time:"8.30 น."},
+  {date:"2026-10-20",n:68,codes:["D10"],place:"สนง.เทศบาลนครสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-10-21",n:69,codes:["D11"],place:"วิทยาลัยพยาบาล",time:"8.30 น."},
+  {date:"2026-10-22",n:14,codes:["D12"],place:"อำเภอบ้านตาขุน",time:"8.30 น."},
+  {date:"2026-10-24",n:62,codes:["D13"],place:"รร.วังใต้",time:"8.30 น."},
+  {date:"2026-10-26",n:9,codes:["D14"],place:"อำเภอชัยบุรี",time:"8.30 น."},
+  {date:"2026-10-28",n:18,codes:["D15"],place:"อำเภอวิภาวดี",time:"8.30 น."},
+  {date:"2026-10-29",n:1,codes:["D16"],place:"ค่ายวิภาวดีรังสิต",time:"8.30 น."},
+  {date:"2026-10-30",n:42,codes:["D17"],place:"ศาลจังหวัดเวียงสระ",time:"8.30 น."},
+  {date:"2026-11-02",n:47,codes:["D18"],place:"ห้างเซ็นทรัลพลาซ่า",time:"8.30 น."},
+  {date:"2026-11-03",n:3,codes:["D19"],place:"มหาวิทยาลัยราชภัฏสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-11-04",n:19,codes:["D20"],place:"บริษัทซีพีแรม",time:"8.30 น."},
+  {date:"2026-11-05",n:43,codes:["D21"],place:"ศูนย์ฝึกอบรมตำรวจภูธรภาค 8",time:"8.30 น."},
+  {date:"2026-11-06",n:66,codes:["D22"],place:"รพ.สต.คลองสระ",time:"8.30 น."},
+  {date:"2026-11-09",n:12,codes:["D23"],place:"อำเภอท่าฉาง",time:"8.30 น."},
+  {date:"2026-11-10",n:68,codes:["D24"],place:"สนง.เทศบาลนครสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-11-11",n:49,codes:["D25"],place:"บริษัทสิริสินสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-11-12",n:64,codes:["D01"],place:"ศูนย์การค้าโคลีเซี่ยมสุราษฎร์ธานี",time:"8.30 น."},
+  {date:"2026-11-13",n:62,codes:["D02"],place:"รร.วังใต้",time:"8.30 น."},
+  {date:"2026-11-16",n:14,codes:["D03"],place:"อำเภอบ้านตาขุน",time:"8.30 น."},
+  {date:"2026-11-17",n:9,codes:["D04"],place:"อำเภอชัยบุรี",time:"8.30 น."},
+  {date:"2026-11-18",n:18,codes:["D05"],place:"อำเภอวิภาวดี",time:"8.30 น."},
+  {date:"2026-11-19",n:1,codes:["D06"],place:"ค่ายวิภาวดีรังสิต",time:"8.30 น."},
+  {date:"2026-11-20",n:42,codes:["D07"],place:"ศาลจังหวัดเวียงสระ",time:"8.30 น."}
+];
+
+var SUPPLY_RECORDS=[
+  {date:"2026-10-06",place:"รพ.สต.คลองสระ",donors:48,water:60,snack:60,rice:50},
+  {date:"2026-10-07",place:"ศาลเยาวชน",donors:35,water:45,snack:40,rice:35},
+  {date:"2026-10-08",place:"ศูนย์การค้าโคลีเซี่ยม",donors:72,water:80,snack:75,rice:70},
+  {date:"2026-10-09",place:"บริษัทซีพีแรม",donors:55,water:65,snack:60,rice:55},
+  {date:"2026-10-12",place:"มหาวิทยาลัยราชภัฏ",donors:120,water:130,snack:125,rice:120},
+  {date:"2026-10-14",place:"ศูนย์ฝึกฯ ตำรวจภูธร",donors:85,water:90,snack:90,rice:85},
+  {date:"2026-10-15",place:"ห้างเซ็นทรัลพลาซ่า",donors:92,water:100,snack:95,rice:90},
+  {date:"2026-10-16",place:"บริษัทสิริสิน",donors:40,water:50,snack:45,rice:40},
+  {date:"2026-10-19",place:"อำเภอท่าฉาง",donors:38,water:45,snack:40,rice:38},
+  {date:"2026-10-20",place:"เทศบาลนคร",donors:65,water:70,snack:70,rice:65},
+  {date:"2026-10-21",place:"วิทยาลัยพยาบาล",donors:88,water:95,snack:90,rice:85},
+  {date:"2026-10-22",place:"อำเภอบ้านตาขุน",donors:32,water:40,snack:35,rice:30},
+  {date:"2026-11-02",place:"ห้างเซ็นทรัลพลาซ่า",donors:78,water:85,snack:80,rice:75},
+  {date:"2026-11-03",place:"มหาวิทยาลัยราชภัฏ",donors:95,water:100,snack:100,rice:95},
+  {date:"2026-11-04",place:"บริษัทซีพีแรม",donors:52,water:60,snack:55,rice:50},
+  {date:"2026-11-05",place:"ศูนย์ฝึกฯ ตำรวจภูธร",donors:68,water:75,snack:70,rice:65},
+  {date:"2026-11-06",place:"รพ.สต.คลองสระ",donors:41,water:50,snack:45,rice:40}
+];
+
+var ATTENDANCE=[
+  {name:"กิ่ง",role:"ผู้ประสานงาน",tel:"088-784-2259",status:"present",time:"07:45"},
+  {name:"สมใจ",role:"พยาบาลวิชาชีพ",tel:"*7301",status:"present",time:"07:50"},
+  {name:"ประภา",role:"นักเทคนิคการแพทย์",tel:"*7302",status:"present",time:"07:55"},
+  {name:"วิชัย",role:"พนักงานขับรถ",tel:"*7305",status:"present",time:"08:00"},
+  {name:"สุดา",role:"เจ้าหน้าที่ธนาคารเลือด",tel:"*7303",status:"late",time:"08:35"},
+  {name:"พรทิพย์",role:"พยาบาลวิชาชีพ",tel:"*7306",status:"present",time:"07:48"},
+  {name:"อนันต์",role:"นักเทคนิคการแพทย์",tel:"*7307",status:"absent",time:"-"},
+  {name:"มณี",role:"เจ้าหน้าที่ธนาคารเลือด",tel:"*7308",status:"present",time:"07:52"},
+  {name:"ธีระ",role:"พนักงานขับรถ",tel:"*7309",status:"present",time:"08:02"},
+  {name:"นภา",role:"ผู้ช่วยพยาบาล",tel:"*7310",status:"leave",time:"-"}
+];
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function pad(n){return n<10?"0"+n:""+n}
+function todayStr(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function pd(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function thaiDate(s){var d=pd(s);return d.getDate()+" "+M[d.getMonth()]+" "+(d.getFullYear()+543)}
+function shortDate(s){var d=pd(s);return d.getDate()+" "+MS[d.getMonth()]}
+function docName(c){var d=DOCS.filter(function(x){return x.code===c})[0];return d?d.name:c}
+function curMonth(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)}
+function evMonth(ym){return EVENTS.filter(function(e){return e.date.slice(0,7)===ym&&e.codes.length>0})}
+function supMonth(ym){return SUPPLY_RECORDS.filter(function(r){return r.date.slice(0,7)===ym})}
+
+function statusLabel(s){
+  if(s==="present") return '<span class="tag tag-ok">มาปกติ</span>';
+  if(s==="late") return '<span class="tag tag-warn">มาสาย</span>';
+  if(s==="absent") return '<span class="tag" style="background:#fee2e2;color:#dc2626">ขาด</span>';
+  if(s==="leave") return '<span class="tag" style="background:#f3e8ff;color:#7c3aed">ลา</span>';
+  return s;
+}
+function statusColor(s){
+  if(s==="present") return "#16a34a";
+  if(s==="late") return "#d97706";
+  if(s==="absent") return "#dc2626";
+  if(s==="leave") return "#7c3aed";
+  return "#64748b";
+}
+
+function renderOverview(){
+  var td=todayStr(), cm=curMonth();
+  var mEvents=evMonth(cm), mSupply=supMonth(cm);
+  var totalDonors=mSupply.reduce(function(a,r){return a+r.donors},0);
+  var totalWater=mSupply.reduce(function(a,r){return a+r.water},0);
+  var totalSnack=mSupply.reduce(function(a,r){return a+r.snack},0);
+  var totalRice=mSupply.reduce(function(a,r){return a+r.rice},0);
+  var present=ATTENDANCE.filter(function(a){return a.status==="present"}).length;
+  var todayEv=EVENTS.filter(function(e){return e.date===td})[0];
+  var upcoming=EVENTS.filter(function(e){return e.date>=td&&e.codes.length>0}).slice(0,5);
+
+  var h='';
+
+  // KPIs
+  h+='<div class="kpi-grid">';
+  h+='<div class="kpi"><div class="kpi-label">ออกหน่วยเดือนนี้</div><div class="kpi-val">'+mEvents.length+'</div><div class="kpi-sub">ครั้ง · จากทั้งหมด '+EVENTS.filter(function(e){return e.date.slice(0,7)===cm}).length+' วัน</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">ผู้บริจาคโลหิต</div><div class="kpi-val">'+totalDonors.toLocaleString()+'</div><div class="kpi-sub">ราย · เดือนนี้</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">เจ้าหน้าที่อยู่เวร</div><div class="kpi-val">'+present+'/'+ATTENDANCE.length+'</div><div class="kpi-sub">คน · พร้อมปฏิบัติงาน</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">ของเบิกเดือนนี้</div><div class="kpi-val">'+(totalWater+totalSnack+totalRice).toLocaleString()+'</div><div class="kpi-sub">ชิ้น · น้ำ/ขนม/ข้าว</div></div>';
+  h+='</div>';
+
+  // Today bar
+  if(todayEv&&todayEv.codes.length){
+    var dn=todayEv.codes.map(docName).join(", ");
+    h+='<div class="today-bar"><div class="tdate"><b>'+pd(td).getDate()+'</b><span>'+M[pd(td).getMonth()].slice(0,3)+'</span></div><div class="tinfo"><h3>📍 วันนี้ออกหน่วย: '+esc(todayEv.place)+'</h3><p>🕐 เวลา '+esc(todayEv.time)+' · 👨‍⚕️ '+esc(dn)+'</p></div></div>';
+  } else {
+    h+='<div class="today-bar"><div class="tdate"><b>'+new Date().getDate()+'</b><span>'+M[new Date().getMonth()].slice(0,3)+'</span></div><div class="tinfo"><h3>📋 วันนี้ '+W[new Date().getDay()]+' — ไม่มีกำหนดออกหน่วย</h3><p>ตรวจสอบตารางเวรถัดไปในส่วนด้านล่าง</p></div></div>';
+  }
+
+  h+='<div class="grid-2">';
+
+  // Upcoming schedule
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--info)"></div><h2>กำหนดออกหน่วยถัดไป</h2></div><div class="card-body" style="padding:0"><table><thead><tr><th>วันที่</th><th>สถานที่</th><th>แพทย์</th></tr></thead><tbody>';
+  upcoming.forEach(function(e){
+    var isToday=e.date===td;
+    h+='<tr'+(isToday?' style="background:var(--infobg)"':'')+'><td style="white-space:nowrap">'+(isToday?'<b style="color:var(--info)">วันนี้</b>':shortDate(e.date)+' '+W[pd(e.date).getDay()].slice(0,2))+'</td><td>'+esc(e.place)+'</td><td style="white-space:nowrap">'+e.codes.map(docName).map(esc).join("<br>")+'</td></tr>';
+  });
+  if(!upcoming.length) h+='<tr><td colspan="3" class="empty">ไม่มีกำหนดการ</td></tr>';
+  h+='</tbody></table></div><a class="card-link" onclick="switchTab(\'roster\')">ดูตารางเวรทั้งหมด →</a></div>';
+
+  // Attendance summary
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--ok)"></div><h2>สถานะเจ้าหน้าที่วันนี้</h2><span class="badge" style="background:var(--okbg);color:var(--ok)">'+present+' / '+ATTENDANCE.length+' คน</span></div><div class="card-body">';
+  ATTENDANCE.slice(0,6).forEach(function(a){
+    h+='<div class="att-row"><div class="att-avatar" style="background:'+statusColor(a.status)+'">'+esc(a.name.charAt(0))+'</div><div class="att-name"><b>'+esc(a.name)+'</b><span>'+esc(a.role)+'</span></div><div class="att-status">'+statusLabel(a.status)+'</div></div>';
+  });
+  h+='</div><a class="card-link" onclick="switchTab(\'attendance\')">ดูรายชื่อทั้งหมด →</a></div>';
+  h+='</div>';
+
+  // Supply and Doctor chart row
+  h+='<div class="grid-2">';
+
+  // Supply summary
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--warn)"></div><h2>สรุปของเบิกเดือนนี้</h2></div><div class="card-body">';
+  h+='<div class="supply-item"><div class="supply-icon" style="background:#dbeafe">💧</div><div class="supply-info"><b>น้ำดื่ม</b><div class="supply-bar"><div style="width:'+Math.min(100,totalWater/10)+'%;background:#3b82f6"></div></div></div><div class="supply-val" style="color:#3b82f6">'+totalWater+'</div></div>';
+  h+='<div class="supply-item"><div class="supply-icon" style="background:#fef3c7">🍪</div><div class="supply-info"><b>ขนม</b><div class="supply-bar"><div style="width:'+Math.min(100,totalSnack/10)+'%;background:#f59e0b"></div></div></div><div class="supply-val" style="color:#f59e0b">'+totalSnack+'</div></div>';
+  h+='<div class="supply-item"><div class="supply-icon" style="background:#dcfce7">🍚</div><div class="supply-info"><b>ข้าวกล่อง</b><div class="supply-bar"><div style="width:'+Math.min(100,totalRice/10)+'%;background:#16a34a"></div></div></div><div class="supply-val" style="color:#16a34a">'+totalRice+'</div></div>';
+  h+='</div><a class="card-link" onclick="switchTab(\'supply\')">ดูรายละเอียดทั้งหมด →</a></div>';
+
+  // Doctor workload chart
+  var docCount={};
+  evMonth(cm).forEach(function(e){e.codes.forEach(function(c){docCount[c]=(docCount[c]||0)+1})});
+  var docArr=Object.keys(docCount).map(function(c){return {code:c,count:docCount[c],name:docName(c)}}).sort(function(a,b){return b.count-a.count});
+  var maxC=docArr.length?docArr[0].count:1;
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--acc)"></div><h2>จำนวนเวรแพทย์เดือนนี้</h2></div><div class="card-body">';
+  var colors=["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#06b6d4","#84cc16"];
+  docArr.slice(0,8).forEach(function(d,i){
+    h+='<div class="hbar"><div class="hbar-label" title="'+esc(d.name)+'">'+esc(d.name.replace(/^(นพ\.|พญ\.)/,""))+'</div><div class="hbar-track"><div class="hbar-fill" style="width:'+Math.round(d.count/maxC*100)+'%;background:'+colors[i%colors.length]+'">'+d.count+'</div></div></div>';
+  });
+  if(!docArr.length) h+='<div class="empty">ยังไม่มีข้อมูล</div>';
+  h+='</div><a class="card-link" onclick="switchTab(\'roster\')">ดูรายชื่อแพทย์ →</a></div>';
+  h+='</div>';
+
+  // Quick links
+  h+='<div class="sec-head">ลิงก์ด่วน — เปิดระบบงาน</div>';
+  h+='<div class="quick-grid">';
+  h+='<a class="quick-link" href="../index.html" target="_blank"><div class="ql-icon" style="background:#fee2e2">📋</div>เวรแพทย์ออกหน่วย</a>';
+  h+='<a class="quick-link" href="../supply/index.html" target="_blank"><div class="ql-icon" style="background:#fef3c7">📦</div>ระบบเบิกของ</a>';
+  h+='<a class="quick-link" onclick="switchTab(\'attendance\')"><div class="ql-icon" style="background:#dcfce7">✅</div>ลงชื่ออยู่เวร</a>';
+  h+='</div>';
+
+  return h;
+}
+
+function renderRoster(){
+  var cm=curMonth(), mEvents=evMonth(cm), td=todayStr();
+  var allMonthEv=EVENTS.filter(function(e){return e.date.slice(0,7)===cm});
+  var h='<div class="sec-head">ตารางเวรแพทย์ออกหน่วย — '+M[new Date().getMonth()]+' '+(new Date().getFullYear()+543)+'</div>';
+
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--info)"></div><h2>ตารางออกหน่วยเดือนนี้</h2><span class="badge" style="background:var(--infobg);color:var(--info)">'+mEvents.length+' หน่วย</span></div>';
+  h+='<div class="card-body" style="padding:0;overflow-x:auto"><table><thead><tr><th>วัน</th><th>วันที่</th><th>สถานที่</th><th>เวลา</th><th>แพทย์</th><th>สถานะ</th></tr></thead><tbody>';
+  allMonthEv.forEach(function(e){
+    var isToday=e.date===td, isPast=e.date<td;
+    var rowStyle=isToday?' style="background:var(--infobg)"':'';
+    var st=!e.codes.length?'<span class="tag tag-warn">ว่าง</span>':isPast?'<span class="tag tag-ok">เสร็จสิ้น</span>':isToday?'<span class="tag tag-info">วันนี้</span>':'<span class="tag" style="background:var(--line);color:var(--mute)">กำหนดการ</span>';
+    h+='<tr'+rowStyle+'><td>'+W[pd(e.date).getDay()]+'</td><td style="white-space:nowrap">'+shortDate(e.date)+'</td><td>'+esc(e.place)+'</td><td>'+esc(e.time)+'</td><td>'+(e.codes.length?e.codes.map(function(c){return esc(docName(c))}).join(", "):'<span style="color:var(--mute)">-</span>')+'</td><td>'+st+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+
+  // Doctors list
+  var docCount={};
+  mEvents.forEach(function(e){e.codes.forEach(function(c){docCount[c]=(docCount[c]||0)+1})});
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--acc)"></div><h2>รายชื่อแพทย์ทั้งหมด</h2><span class="badge" style="background:color-mix(in srgb, var(--acc) 15%, var(--card));color:var(--acc)">'+DOCS.length+' คน</span></div>';
+  h+='<div class="card-body" style="padding:0;overflow-x:auto"><table><thead><tr><th>รหัส</th><th>ชื่อแพทย์</th><th>เบอร์โทร</th><th>เวรเดือนนี้</th></tr></thead><tbody>';
+  DOCS.forEach(function(d){
+    var cnt=docCount[d.code]||0;
+    h+='<tr><td><b>'+esc(d.code)+'</b></td><td>'+esc(d.name)+'</td><td style="color:var(--mute)">'+esc(d.tel)+'</td><td>'+(cnt?'<b style="color:var(--info)">'+cnt+' ครั้ง</b>':'<span style="color:var(--mute)">-</span>')+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+
+  return h;
+}
+
+function renderSupply(){
+  var cm=curMonth(), mSupply=supMonth(cm);
+  var totalDonors=mSupply.reduce(function(a,r){return a+r.donors},0);
+  var totalWater=mSupply.reduce(function(a,r){return a+r.water},0);
+  var totalSnack=mSupply.reduce(function(a,r){return a+r.snack},0);
+  var totalRice=mSupply.reduce(function(a,r){return a+r.rice},0);
+
+  var h='<div class="sec-head">ระบบเบิกของออกหน่วย — '+M[new Date().getMonth()]+' '+(new Date().getFullYear()+543)+'</div>';
+
+  // Summary cards
+  h+='<div class="kpi-grid">';
+  h+='<div class="kpi"><div class="kpi-label">ผู้บริจาคทั้งหมด</div><div class="kpi-val">'+totalDonors.toLocaleString()+'</div><div class="kpi-sub">ราย · '+mSupply.length+' ครั้ง</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">น้ำดื่ม</div><div class="kpi-val">'+totalWater.toLocaleString()+'</div><div class="kpi-sub">ขวด</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">ขนม</div><div class="kpi-val">'+totalSnack.toLocaleString()+'</div><div class="kpi-sub">ชิ้น</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">ข้าวกล่อง</div><div class="kpi-val">'+totalRice.toLocaleString()+'</div><div class="kpi-sub">กล่อง</div></div>';
+  h+='</div>';
+
+  // Records table
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--warn)"></div><h2>รายการเบิกของเดือนนี้</h2></div>';
+  h+='<div class="card-body" style="padding:0;overflow-x:auto"><table><thead><tr><th>วันที่</th><th>สถานที่</th><th style="text-align:right">ผู้บริจาค</th><th style="text-align:right">💧 น้ำ</th><th style="text-align:right">🍪 ขนม</th><th style="text-align:right">🍚 ข้าว</th></tr></thead><tbody>';
+  mSupply.forEach(function(r){
+    h+='<tr><td style="white-space:nowrap">'+shortDate(r.date)+'</td><td>'+esc(r.place)+'</td><td style="text-align:right;font-weight:700;color:var(--info)">'+r.donors+'</td><td style="text-align:right">'+r.water+'</td><td style="text-align:right">'+r.snack+'</td><td style="text-align:right">'+r.rice+'</td></tr>';
+  });
+  if(!mSupply.length) h+='<tr><td colspan="6" class="empty">ยังไม่มีข้อมูลเดือนนี้</td></tr>';
+  h+='<tr style="font-weight:700;background:color-mix(in srgb,var(--info) 8%,var(--card))"><td colspan="2" style="text-align:right">รวมทั้งเดือน</td><td style="text-align:right;color:var(--info)">'+totalDonors+'</td><td style="text-align:right">'+totalWater+'</td><td style="text-align:right">'+totalSnack+'</td><td style="text-align:right">'+totalRice+'</td></tr>';
+  h+='</tbody></table></div></div>';
+
+  // Donors per unit chart
+  var sorted=mSupply.slice().sort(function(a,b){return b.donors-a.donors});
+  var maxD=sorted.length?sorted[0].donors:1;
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--kpi2)"></div><h2>ยอดผู้บริจาคแต่ละหน่วย</h2></div><div class="card-body">';
+  var barColors=["#ef4444","#f97316","#f59e0b","#84cc16","#22c55e","#06b6d4","#3b82f6","#8b5cf6","#a855f7","#ec4899","#f43f5e","#64748b"];
+  sorted.forEach(function(r,i){
+    h+='<div class="hbar"><div class="hbar-label" title="'+esc(r.place)+'">'+esc(r.place)+'</div><div class="hbar-track"><div class="hbar-fill" style="width:'+Math.round(r.donors/maxD*100)+'%;background:'+barColors[i%barColors.length]+'">'+r.donors+'</div></div></div>';
+  });
+  h+='</div></div>';
+
+  return h;
+}
+
+function renderAttendance(){
+  var present=ATTENDANCE.filter(function(a){return a.status==="present"}).length;
+  var late=ATTENDANCE.filter(function(a){return a.status==="late"}).length;
+  var absent=ATTENDANCE.filter(function(a){return a.status==="absent"}).length;
+  var leave=ATTENDANCE.filter(function(a){return a.status==="leave"}).length;
+  var total=ATTENDANCE.length;
+
+  var h='<div class="sec-head">ลงชื่ออยู่เวร — '+new Date().getDate()+' '+M[new Date().getMonth()]+' '+(new Date().getFullYear()+543)+'</div>';
+
+  // Attendance KPIs
+  h+='<div class="kpi-grid">';
+  h+='<div class="kpi"><div class="kpi-label">มาปกติ</div><div class="kpi-val" style="color:var(--ok)">'+present+'</div><div class="kpi-sub">คน</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">มาสาย</div><div class="kpi-val" style="color:var(--warn)">'+late+'</div><div class="kpi-sub">คน</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">ขาด</div><div class="kpi-val" style="color:#dc2626">'+absent+'</div><div class="kpi-sub">คน</div></div>';
+  h+='<div class="kpi"><div class="kpi-label">ลา</div><div class="kpi-val" style="color:#7c3aed">'+leave+'</div><div class="kpi-sub">คน</div></div>';
+  h+='</div>';
+
+  // Attendance percentage bar
+  var pctPresent=Math.round(present/total*100);
+  h+='<div class="card" style="margin-bottom:18px"><div class="card-body">';
+  h+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px"><div style="font-size:42px;font-weight:800;color:var(--ok)">'+pctPresent+'%</div><div><div style="font-weight:700;font-size:16px">อัตราการมาปฏิบัติงาน</div><div style="color:var(--mute);font-size:13px">เจ้าหน้าที่พร้อมปฏิบัติงาน '+present+' จาก '+total+' คน</div></div></div>';
+  h+='<div style="height:12px;background:var(--line);border-radius:6px;overflow:hidden;display:flex">';
+  h+='<div style="width:'+(present/total*100)+'%;background:var(--ok)"></div>';
+  h+='<div style="width:'+(late/total*100)+'%;background:var(--warn)"></div>';
+  h+='<div style="width:'+(absent/total*100)+'%;background:#dc2626"></div>';
+  h+='<div style="width:'+(leave/total*100)+'%;background:#7c3aed"></div>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--mute);flex-wrap:wrap">';
+  h+='<span>🟢 มาปกติ '+present+'</span><span>🟡 สาย '+late+'</span><span>🔴 ขาด '+absent+'</span><span>🟣 ลา '+leave+'</span>';
+  h+='</div></div></div>';
+
+  // Full attendance list
+  h+='<div class="card"><div class="card-h"><div class="dot" style="background:var(--ok)"></div><h2>รายชื่อเจ้าหน้าที่</h2></div>';
+  h+='<div class="card-body" style="padding:0;overflow-x:auto"><table><thead><tr><th>ชื่อ</th><th>ตำแหน่ง</th><th>เบอร์โทร</th><th>เวลาเข้าเวร</th><th>สถานะ</th></tr></thead><tbody>';
+  ATTENDANCE.forEach(function(a){
+    h+='<tr><td><b>'+esc(a.name)+'</b></td><td>'+esc(a.role)+'</td><td style="color:var(--mute)">'+esc(a.tel)+'</td><td>'+(a.time!=="-"?esc(a.time)+' น.':'<span style="color:var(--mute)">-</span>')+'</td><td>'+statusLabel(a.status)+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+
+  return h;
+}
+
+function render(){
+  var h;
+  if(tab==="overview") h=renderOverview();
+  else if(tab==="roster") h=renderRoster();
+  else if(tab==="supply") h=renderSupply();
+  else if(tab==="attendance") h=renderAttendance();
+  else h=renderOverview();
+  document.getElementById("app").innerHTML=h;
+
+  var btns=document.querySelectorAll("#tabs button");
+  btns.forEach(function(b){b.className=b.getAttribute("data-t")===tab?"on":""});
+}
+
+function switchTab(t){tab=t;render();window.scrollTo(0,0)}
+
+document.getElementById("tabs").addEventListener("click",function(e){
+  var t=e.target.closest("button");
+  if(t&&t.dataset.t){switchTab(t.dataset.t)}
+});
+
+// Clock
+function updateClock(){
+  var d=new Date();
+  var s=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+  var el=document.getElementById("clock");
+  if(el) el.textContent=W[d.getDay()]+" "+d.getDate()+" "+MS[d.getMonth()]+" "+pad(d.getHours())+":"+pad(d.getMinutes());
+}
+updateClock();setInterval(updateClock,30000);
+
+// Theme
+var THEME="auto";
+try{var t0=localStorage.getItem("dashTheme");if(["auto","light","dark"].indexOf(t0)>=0)THEME=t0}catch(e){}
+function applyTheme(){document.documentElement.setAttribute("data-theme",THEME==="auto"?"":THEME)}
+applyTheme();
+document.getElementById("themeBtn").onclick=function(){
+  THEME=THEME==="auto"?"dark":THEME==="dark"?"light":"auto";
+  try{localStorage.setItem("dashTheme",THEME)}catch(e){}
+  applyTheme();
+};
+
+// Refresh
+document.getElementById("refreshBtn").onclick=function(){render()};
+
+render();
+</script>
+</body>
+</html>
