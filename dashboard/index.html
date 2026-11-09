@@ -354,12 +354,19 @@ var ATTENDANCE=loadAtt();
 var ATT_STATUS=[["present","มาปกติ"],["late","มาสาย"],["absent","ขาด"],["leave","ลา"]];
 // Google Sheets bridge — active automatically when served from Google Apps Script
 var GS=(typeof google!=="undefined"&&google.script&&google.script.run);
-function syncFromSheet(){
+var LIVE=false;
+function loadBoard(){
   if(!GS)return;
-  google.script.run.withSuccessHandler(function(list){
-    if(list&&list.length){ATTENDANCE=list;try{localStorage.setItem(attKey(),JSON.stringify(ATTENDANCE))}catch(e){}
-      if(tab==="attendance"||tab==="overview")render();}
-  }).withFailureHandler(function(){}).getAttendance(attKey());
+  google.script.run.withSuccessHandler(function(d){
+    if(d){
+      if(d.docs&&d.docs.length)DOCS=d.docs;
+      if(d.events&&d.events.length)EVENTS=d.events;
+      if(d.supply)SUPPLY_RECORDS=d.supply;
+      if(d.attendance&&d.attendance.length){ATTENDANCE=d.attendance;try{localStorage.setItem(attKey(),JSON.stringify(ATTENDANCE))}catch(e){}}
+      LIVE=true;
+    }
+    render();
+  }).withFailureHandler(function(){render()}).getBoardData(attKey());
 }
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -675,10 +682,10 @@ document.getElementById("themeBtn").onclick=function(){
 };
 
 // Refresh
-document.getElementById("refreshBtn").onclick=function(){if(GS)syncFromSheet();render()};
+document.getElementById("refreshBtn").onclick=function(){if(GS)loadBoard();else render()};
 
 render();
-if(GS)syncFromSheet();
+if(GS)loadBoard();
 </script>
 </body>
 </html>
