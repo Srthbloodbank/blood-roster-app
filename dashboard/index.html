@@ -162,6 +162,66 @@ tbody tr:hover { background: color-mix(in srgb, var(--info) 5%, var(--card)) }
 /* Empty */
 .empty { text-align: center; padding: 28px 16px; color: var(--mute); font-size: 14px }
 
+/* ===== 3D floating-island hero ===== */
+.scene{position:relative;overflow:hidden;padding:6px 12px 2px;
+  background:linear-gradient(180deg,#8ed0ff 0%,#bfe6ff 48%,var(--bg) 100%)}
+:root[data-theme="dark"] .scene{background:linear-gradient(180deg,#13325a 0%,#0e2543 48%,var(--bg) 100%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .scene{background:linear-gradient(180deg,#13325a 0%,#0e2543 48%,var(--bg) 100%)}}
+.scene .inner{position:relative;max-width:1060px;margin:0 auto;min-height:300px}
+.sun{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;
+  background:radial-gradient(circle at 40% 38%,#fff6c2,#ffd23f 58%,#ffb02e);
+  box-shadow:0 0 40px 8px rgba(255,208,63,.55);animation:bbreathe 5s ease-in-out infinite;z-index:1}
+.cloud{position:absolute;background:#fff;border-radius:50%;opacity:.9;z-index:1}
+:root[data-theme="dark"] .cloud{background:#24395a;opacity:.5}
+.cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+.c1{width:60px;height:22px;top:46px;left:5%;animation:bdrift 24s linear infinite}
+.c1::before{width:30px;height:30px;top:-13px;left:10px}.c1::after{width:22px;height:22px;top:-8px;left:34px}
+.c2{width:72px;height:24px;top:24px;right:7%;animation:bdrift 32s linear infinite reverse}
+.c2::before{width:34px;height:34px;top:-15px;left:12px}.c2::after{width:24px;height:24px;top:-7px;left:42px}
+.rainbow-arc{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:430px;height:210px;max-width:92%;z-index:0;opacity:.68;
+  border-radius:50% 50% 0 0/100% 100% 0 0;
+  background:radial-gradient(circle at bottom,transparent 61%,#ff5d5d 61% 65%,#ffa93d 65% 69%,#ffe24a 69% 73%,#7bd957 73% 77%,#5db6ff 77% 81%,#9a7bff 81% 85%,transparent 85%)}
+@keyframes bbreathe{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.07)}}
+@keyframes bdrift{from{transform:translateX(-24px)}to{transform:translateX(52px)}}
+@keyframes bbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.cluster{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr 1fr;
+  grid-template-areas:"hub hub hub" "a b c";gap:2px 10px;align-items:end;padding-top:66px}
+.hub-wrap{grid-area:hub;justify-self:center}
+.isl-a{grid-area:a}.isl-b{grid-area:b}.isl-c{grid-area:c}
+.island{position:relative;width:100%;max-width:190px;margin:0 auto;cursor:pointer;text-align:center;transition:transform .2s}
+.island:hover{transform:translateY(-7px)}
+.island.sel .grass{outline:3px solid var(--ic);outline-offset:4px}
+.float{animation:bbob var(--dur,4s) ease-in-out infinite;animation-delay:var(--del,0s)}
+.bld{font-size:42px;line-height:1;filter:drop-shadow(0 6px 4px rgba(0,0,0,.25));position:relative;z-index:3;margin-bottom:-6px;display:inline-block}
+.grass{position:relative;width:132px;max-width:76%;height:42px;margin:0 auto;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 28%,#a7f3b6,#34d06a 62%,#1aa34e);
+  box-shadow:inset 0 -7px 0 rgba(0,0,0,.1);z-index:2}
+.rock{position:relative;margin-top:-15px;z-index:1;filter:drop-shadow(0 18px 14px rgba(20,40,70,.3))}
+.rock i{display:block;margin:-10px auto 0;border-radius:50%;background:linear-gradient(180deg,#9c6b3f,#6b4423 60%,#4a2f17)}
+.rock i:nth-child(1){width:100px;height:24px;margin-top:0}
+.rock i:nth-child(2){width:70px;height:20px}
+.rock i:nth-child(3){width:42px;height:18px}
+.rock i:nth-child(4){width:18px;height:14px;background:linear-gradient(180deg,#5a3a1d,#3a2410)}
+.island .label{margin-top:9px;font-weight:700;font-size:14px}
+.chip3{position:absolute;top:0;right:4px;z-index:4;background:var(--card);color:var(--ic);border:2px solid var(--ic);
+  border-radius:999px;padding:3px 10px;font-weight:800;font-size:13px;font-family:"IBM Plex Sans Thai",sans-serif;
+  box-shadow:0 4px 10px rgba(20,40,70,.18);white-space:nowrap}
+.hub-wrap .island{max-width:220px}.hub-wrap .bld{font-size:54px}.hub-wrap .grass{width:160px;height:50px}.hub-wrap .rock i:nth-child(1){width:118px}
+.bridge{position:absolute;height:12px;width:140px;border-radius:40px;z-index:1;opacity:.72;
+  background:repeating-linear-gradient(90deg,#ff5d5d 0 5px,#ffa93d 5px 10px,#ffe24a 10px 15px,#7bd957 15px 20px,#5db6ff 20px 25px,#9a7bff 25px 30px);
+  box-shadow:0 5px 9px rgba(20,40,70,.18)}
+.bridge.bl{top:138px;left:22%;transform:rotate(33deg)}
+.bridge.br{top:138px;right:22%;transform:rotate(-33deg)}
+.bridge.bm{top:140px;left:50%;transform:translateX(-50%);width:64px}
+.nomo .float,.nomo .sun,.nomo .cloud{animation:none!important}
+@media(max-width:720px){.bridge{display:none}}
+@media(max-width:560px){
+  .cluster{grid-template-columns:1fr 1fr;grid-template-areas:"hub hub" "a b" "c c";padding-top:52px;gap:12px 8px}
+  .scene .inner{min-height:280px}
+  .island{max-width:140px}.hub-wrap .island{max-width:160px}
+  .bld{font-size:36px}.hub-wrap .bld{font-size:44px}.grass{height:38px}
+}
+
 /* Admin mode */
 .adminbar{display:flex;align-items:center;gap:10px;background:var(--warnbg);color:var(--warn);border:1px solid var(--warn);
   border-radius:14px;padding:12px 16px;margin-bottom:18px;font-weight:600;font-size:14px}
@@ -218,6 +278,17 @@ tbody tr:hover { background: color-mix(in srgb, var(--info) 5%, var(--card)) }
     </div>
   </div>
 </div>
+
+<div class="scene"><div class="inner">
+  <div class="sun"></div>
+  <div class="rainbow-arc"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="bridge bl"></div>
+  <div class="bridge bm"></div>
+  <div class="bridge br"></div>
+  <div class="cluster" id="cluster"></div>
+</div></div>
 
 <div class="nav">
   <div class="nav-inner" id="tabs">
@@ -603,7 +674,32 @@ function renderAttendance(){
   return h;
 }
 
+function renderScene(){
+  var cl=document.getElementById("cluster");if(!cl)return;
+  var cm=curMonth();
+  var ev=EVENTS.filter(function(e){return e.date.slice(0,7)===cm&&e.codes.length}).length;
+  var donors=SUPPLY_RECORDS.filter(function(r){return r.date.slice(0,7)===cm}).reduce(function(a,r){return a+r.donors},0);
+  var present=ATTENDANCE.filter(function(a){return a.status==="present"}).length,total=ATTENDANCE.length;
+  var d=new Date();
+  function one(o){
+    return '<div class="island float'+(tab===o.p?" sel":"")+' '+o.cls+'" data-p="'+o.p+'" style="--ic:'+o.ic+';--dur:'+o.dur+';--del:'+o.del+'">'
+      +'<div class="chip3">'+o.chip+'</div><div class="bld">'+o.bld+'</div><div class="grass"></div>'
+      +'<div class="rock"><i></i><i></i><i></i><i></i></div><div class="label">'+esc(o.name)+'</div></div>';
+  }
+  var isl=[
+    {p:"roster",cls:"isl-a",bld:"🍄",name:"เวรแพทย์ออกหน่วย",chip:ev+" หน่วย",ic:"#2563eb",dur:"4s",del:".2s"},
+    {p:"supply",cls:"isl-b",bld:"🌳",name:"ระบบเบิกของ",chip:donors.toLocaleString()+" ราย",ic:"#d97706",dur:"5s",del:".6s"},
+    {p:"attendance",cls:"isl-c",bld:"🔮",name:"ลงชื่ออยู่เวร",chip:present+"/"+total,ic:"#16a34a",dur:"4.4s",del:"1s"}
+  ];
+  var hub='<div class="hub-wrap"><div class="island float'+(tab==="overview"?" sel":"")+'" data-p="overview" style="--ic:var(--acc);--dur:4.6s">'
+    +'<div class="chip3" style="color:var(--acc);border-color:var(--acc)">'+d.getDate()+' '+MS[d.getMonth()]+'</div>'
+    +'<div class="bld">🏰</div><div class="grass"></div><div class="rock"><i></i><i></i><i></i><i></i></div>'
+    +'<div class="label">ภาพรวม</div></div></div>';
+  cl.innerHTML=hub+isl.map(one).join("");
+}
+
 function render(){
+  renderScene();
   var h;
   if(tab==="overview") h=renderOverview();
   else if(tab==="roster") h=renderRoster();
@@ -621,6 +717,11 @@ function switchTab(t){tab=t;render();window.scrollTo(0,0)}
 document.getElementById("tabs").addEventListener("click",function(e){
   var t=e.target.closest("button");
   if(t&&t.dataset.t){switchTab(t.dataset.t)}
+});
+document.getElementById("cluster").addEventListener("click",function(e){
+  var isl=e.target.closest(".island");if(!isl)return;
+  tab=isl.dataset.p;render();
+  var nav=document.querySelector(".nav");if(nav)nav.scrollIntoView({behavior:"smooth",block:"start"});
 });
 
 // ===== admin edit events =====
