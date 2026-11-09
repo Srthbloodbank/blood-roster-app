@@ -348,9 +348,19 @@ function attKey(){var d=new Date();return "bbatt:"+d.getFullYear()+"-"+pad(d.get
 function loadAtt(){try{var r=localStorage.getItem(attKey());if(r){var a=JSON.parse(r);if(a&&a.length)return a}}catch(e){}
   return DEFAULT_ATT.map(function(x){return Object.assign({},x)})}
 function saveAtt(){try{localStorage.setItem(attKey(),JSON.stringify(ATTENDANCE))}catch(e){}
-  var s=document.getElementById("asaved");if(s){s.textContent="✓ บันทึกแล้ว";clearTimeout(window._at);window._at=setTimeout(function(){if(s)s.textContent=""},1600)}}
+  if(GS)google.script.run.withFailureHandler(function(){}).saveAttendance(attKey(),ATTENDANCE);
+  var s=document.getElementById("asaved");if(s){s.textContent=GS?"✓ บันทึกลงชีตแล้ว":"✓ บันทึกแล้ว";clearTimeout(window._at);window._at=setTimeout(function(){if(s)s.textContent=""},1600)}}
 var ATTENDANCE=loadAtt();
 var ATT_STATUS=[["present","มาปกติ"],["late","มาสาย"],["absent","ขาด"],["leave","ลา"]];
+// Google Sheets bridge — active automatically when served from Google Apps Script
+var GS=(typeof google!=="undefined"&&google.script&&google.script.run);
+function syncFromSheet(){
+  if(!GS)return;
+  google.script.run.withSuccessHandler(function(list){
+    if(list&&list.length){ATTENDANCE=list;try{localStorage.setItem(attKey(),JSON.stringify(ATTENDANCE))}catch(e){}
+      if(tab==="attendance"||tab==="overview")render();}
+  }).withFailureHandler(function(){}).getAttendance(attKey());
+}
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function pad(n){return n<10?"0"+n:""+n}
@@ -665,9 +675,10 @@ document.getElementById("themeBtn").onclick=function(){
 };
 
 // Refresh
-document.getElementById("refreshBtn").onclick=function(){render()};
+document.getElementById("refreshBtn").onclick=function(){if(GS)syncFromSheet();render()};
 
 render();
+if(GS)syncFromSheet();
 </script>
 </body>
 </html>
