@@ -207,6 +207,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--info) 5%, var(--card)) }
   border-radius:999px;padding:3px 10px;font-weight:800;font-size:13px;font-family:"IBM Plex Sans Thai",sans-serif;
   box-shadow:0 4px 10px rgba(20,40,70,.18);white-space:nowrap}
 .hub-wrap .island{max-width:220px}.hub-wrap .bld{font-size:54px}.hub-wrap .grass{width:160px;height:50px}.hub-wrap .rock i:nth-child(1){width:118px}
+/* game-city decorations */
+.grass{overflow:visible}
+.grass .deco{position:absolute;top:-12px;z-index:4;filter:drop-shadow(0 3px 2px rgba(0,0,0,.22))}
+.grass .deco.l{left:6%;font-size:17px}
+.grass .deco.r{right:6%;top:-7px;font-size:15px}
+.island .char{position:absolute;top:-3px;left:0;font-size:18px;z-index:6;filter:drop-shadow(0 3px 3px rgba(0,0,0,.28));animation:bbob 3.2s ease-in-out infinite}
+.spark{position:absolute;z-index:1;font-size:13px;opacity:.6;animation:btwinkle 2.6s ease-in-out infinite}
+.spark.s1{top:70px;left:15%;animation-delay:0s}.spark.s2{top:40px;right:20%;animation-delay:.7s;font-size:16px}
+.spark.s3{top:128px;left:42%;animation-delay:1.3s}.spark.s4{top:96px;right:34%;animation-delay:1.9s;font-size:15px}
+.spark.s5{top:58px;left:62%;animation-delay:.4s}
+@keyframes btwinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:.95;transform:scale(1.15)}}
+.livebadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#fff;background:rgba(22,163,74,.92);border-radius:999px;padding:5px 11px}
+.livebadge .dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:bpulse 1.4s ease-in-out infinite}
+@keyframes bpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.7)}}
+.nomo .char,.nomo .spark{animation:none!important}
 .bridge{position:absolute;height:12px;width:140px;border-radius:40px;z-index:1;opacity:.72;
   background:repeating-linear-gradient(90deg,#ff5d5d 0 5px,#ffa93d 5px 10px,#ffe24a 10px 15px,#7bd957 15px 20px,#5db6ff 20px 25px,#9a7bff 25px 30px);
   box-shadow:0 5px 9px rgba(20,40,70,.18)}
@@ -271,6 +286,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--info) 5%, var(--card)) }
       <div class="sub">ธนาคารเลือด โรงพยาบาลสุราษฎร์ธานี</div>
     </div>
     <div class="topbar-right">
+      <span id="liveBadge"></span>
       <div class="clock" id="clock"></div>
       <button class="btn-icon" id="adminBtn" type="button" title="โหมดหัวหน้า/แอดมิน">🔧</button>
       <button class="btn-icon" id="themeBtn" type="button" title="เปลี่ยนโหมดสี">🌓</button>
@@ -287,6 +303,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--info) 5%, var(--card)) }
   <div class="bridge bl"></div>
   <div class="bridge bm"></div>
   <div class="bridge br"></div>
+  <span class="spark s1">✨</span><span class="spark s2">⭐</span><span class="spark s3">✨</span><span class="spark s4">✨</span><span class="spark s5">⭐</span>
   <div class="cluster" id="cluster"></div>
 </div></div>
 
@@ -683,23 +700,30 @@ function renderScene(){
   var d=new Date();
   function one(o){
     return '<div class="island float'+(tab===o.p?" sel":"")+' '+o.cls+'" data-p="'+o.p+'" style="--ic:'+o.ic+';--dur:'+o.dur+';--del:'+o.del+'">'
-      +'<div class="chip3">'+o.chip+'</div><div class="bld">'+o.bld+'</div><div class="grass"></div>'
+      +'<div class="chip3">'+o.chip+'</div>'
+      +(o.char?'<div class="char">'+o.char+'</div>':'')
+      +'<div class="bld">'+o.bld+'</div>'
+      +'<div class="grass"><span class="deco l">'+o.dl+'</span><span class="deco r">'+o.dr+'</span></div>'
       +'<div class="rock"><i></i><i></i><i></i><i></i></div><div class="label">'+esc(o.name)+'</div></div>';
   }
   var isl=[
-    {p:"roster",cls:"isl-a",bld:"🍄",name:"เวรแพทย์ออกหน่วย",chip:ev+" หน่วย",ic:"#2563eb",dur:"4s",del:".2s"},
-    {p:"supply",cls:"isl-b",bld:"🌳",name:"ระบบเบิกของ",chip:donors.toLocaleString()+" ราย",ic:"#d97706",dur:"5s",del:".6s"},
-    {p:"attendance",cls:"isl-c",bld:"🔮",name:"ลงชื่ออยู่เวร",chip:present+"/"+total,ic:"#16a34a",dur:"4.4s",del:"1s"}
+    {p:"roster",cls:"isl-a",bld:"🍄",name:"เวรแพทย์ออกหน่วย",chip:ev+" หน่วย",ic:"#2563eb",dur:"4s",del:".2s",char:"🧑‍⚕️",dl:"🌲",dr:"🏡"},
+    {p:"supply",cls:"isl-b",bld:"🌳",name:"ระบบเบิกของ",chip:donors.toLocaleString()+" ราย",ic:"#d97706",dur:"5s",del:".6s",char:"🚐",dl:"📦",dr:"🧃"},
+    {p:"attendance",cls:"isl-c",bld:"🔮",name:"ลงชื่ออยู่เวร",chip:present+"/"+total,ic:"#16a34a",dur:"4.4s",del:"1s",char:"🧚",dl:"🌸",dr:"🏛️"}
   ];
   var hub='<div class="hub-wrap"><div class="island float'+(tab==="overview"?" sel":"")+'" data-p="overview" style="--ic:var(--acc);--dur:4.6s">'
     +'<div class="chip3" style="color:var(--acc);border-color:var(--acc)">'+d.getDate()+' '+MS[d.getMonth()]+'</div>'
-    +'<div class="bld">🏰</div><div class="grass"></div><div class="rock"><i></i><i></i><i></i><i></i></div>'
+    +'<div class="char">👑</div><div class="bld">🏰</div>'
+    +'<div class="grass"><span class="deco l">🌳</span><span class="deco r">🚩</span></div>'
+    +'<div class="rock"><i></i><i></i><i></i><i></i></div>'
     +'<div class="label">ภาพรวม</div></div></div>';
   cl.innerHTML=hub+isl.map(one).join("");
 }
 
 function render(){
   renderScene();
+  var lb=document.getElementById("liveBadge");
+  if(lb)lb.innerHTML=LIVE?'<span class="livebadge"><span class="dot"></span>เรียลไทม์</span>':'';
   var h;
   if(tab==="overview") h=renderOverview();
   else if(tab==="roster") h=renderRoster();
@@ -786,7 +810,7 @@ document.getElementById("themeBtn").onclick=function(){
 document.getElementById("refreshBtn").onclick=function(){if(GS)loadBoard();else render()};
 
 render();
-if(GS)loadBoard();
+if(GS){loadBoard();setInterval(function(){if(!document.hidden&&!ADMIN)loadBoard()},30000);}
 </script>
 </body>
 </html>
