@@ -415,7 +415,7 @@ function openPanel(mod){
   var title=document.getElementById('pTitle'),body=document.getElementById('pBody');
   if(mod==='hospital'){title.textContent='🏥 เวรแพทย์ออกหน่วย';body.innerHTML=renderSched()+linkBtn('https://script.google.com/macros/s/AKfycbwPDB2wT_JsJReueV3DKhyEdk-I_lcRTbtC00fCGOliBKrDalHoyr7VT6zH4LNjVf9G/exec','เปิดตารางเวรเต็ม')}
   else if(mod==='submarine'){title.textContent='🚢 ลงชื่ออยู่เวรห้อง';body.innerHTML=renderRoom()+linkBtn('https://script.google.com/macros/s/AKfycbyvp6sZNTHTX5QxVwXlakdIiiq2Aocpde6QOtUnHRYHDYN__9nHuU5MT2TwFkOYf4yV/exec','เปิดระบบเวรห้องเต็ม');bindRoom()}
-  else if(mod==='market'){title.textContent='🏪 Supply BB';body.innerHTML=renderSupply()+linkBtn(SUPPLY_API,'เปิด Supply BB ลงข้อมูล');fetchSupply()}
+  else if(mod==='market'){title.textContent='🏪 Supply BB';body.innerHTML=renderSupply()+linkBtn('https://srthbloodbank.github.io/blood-roster-app/supply/','เปิด Supply BB ลงข้อมูล');fetchSupply()}
   document.getElementById('pnl').classList.add('open');
   document.getElementById('pov').classList.add('open');
 }
@@ -492,7 +492,7 @@ function fetchSupply(){
   var cb='_supCb'+Date.now();
   window[cb]=function(d){
     delete window[cb];var s=document.getElementById('supplyJsonp');if(s)s.remove();
-    if(d&&d.ok&&Array.isArray(d.records)){supplyData=d.records;try{localStorage.setItem('bbSupplyDash',JSON.stringify(supplyData))}catch(e){}updateBadges();if(document.getElementById('pnl').classList.contains('open')&&document.querySelector('#pTitle').textContent.indexOf('Supply')>-1){document.getElementById('pBody').innerHTML=renderSupply()+linkBtn(SUPPLY_API,'เปิด Supply BB ลงข้อมูล')}}
+    if(d&&d.ok&&Array.isArray(d.records)){supplyData=d.records;try{localStorage.setItem('bbSupplyDash',JSON.stringify(supplyData))}catch(e){}updateBadges();if(document.getElementById('pnl').classList.contains('open')&&document.querySelector('#pTitle').textContent.indexOf('Supply')>-1){document.getElementById('pBody').innerHTML=renderSupply()+linkBtn('https://srthbloodbank.github.io/blood-roster-app/supply/','เปิด Supply BB ลงข้อมูล')}}
   };
   var s=document.createElement('script');s.id='supplyJsonp';s.src=SUPPLY_API+'?callback='+cb;
   s.onerror=function(){delete window[cb];s.remove()};
