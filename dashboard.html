@@ -415,7 +415,7 @@ function openPanel(mod){
   var title=document.getElementById('pTitle'),body=document.getElementById('pBody');
   if(mod==='hospital'){title.textContent='🏥 เวรแพทย์ออกหน่วย';body.innerHTML=renderSched()+linkBtn('index.html','เปิดตารางเวรเต็ม')}
   else if(mod==='submarine'){title.textContent='🚢 ลงชื่ออยู่เวรห้อง';body.innerHTML=renderRoom();bindRoom()}
-  else if(mod==='market'){title.textContent='🏪 Supply BB';body.innerHTML=renderSupply()+linkBtn('supply/index.html','เปิด Supply BB เต็ม')}
+  else if(mod==='market'){title.textContent='🏪 Supply BB';body.innerHTML=renderSupply()+linkBtn(SUPPLY_API,'เปิด Supply BB ลงข้อมูล');fetchSupply()}
   document.getElementById('pnl').classList.add('open');
   document.getElementById('pov').classList.add('open');
 }
@@ -481,8 +481,23 @@ function bindRoom(){
 function refreshRoom(){document.getElementById('pBody').innerHTML=renderRoom();bindRoom()}
 
 /* supply */
+var SUPPLY_API='https://script.google.com/macros/s/AKfycbxXzn1pFVTcPKeH2NhZvCEh_BfrIff8nTpUBUymCMyfwUNg0yHyWH4kvy5-sehWX7Ov5w/exec';
 var supplyData=[];
-function loadSupply(){try{var r=localStorage.getItem('bbSupplyDash');if(r)supplyData=JSON.parse(r)}catch(e){supplyData=[]}if(!Array.isArray(supplyData))supplyData=[]}
+function loadSupply(){
+  try{var r=localStorage.getItem('bbSupplyDash');if(r)supplyData=JSON.parse(r)}catch(e){supplyData=[]}
+  if(!Array.isArray(supplyData))supplyData=[];
+  fetchSupply();
+}
+function fetchSupply(){
+  var cb='_supCb'+Date.now();
+  window[cb]=function(d){
+    delete window[cb];var s=document.getElementById('supplyJsonp');if(s)s.remove();
+    if(d&&d.ok&&Array.isArray(d.records)){supplyData=d.records;try{localStorage.setItem('bbSupplyDash',JSON.stringify(supplyData))}catch(e){}updateBadges();if(document.getElementById('pnl').classList.contains('open')&&document.querySelector('#pTitle').textContent.indexOf('Supply')>-1){document.getElementById('pBody').innerHTML=renderSupply()+linkBtn(SUPPLY_API,'เปิด Supply BB ลงข้อมูล')}}
+  };
+  var s=document.createElement('script');s.id='supplyJsonp';s.src=SUPPLY_API+'?callback='+cb;
+  s.onerror=function(){delete window[cb];s.remove()};
+  document.head.appendChild(s);
+}
 function renderSupply(){
   var now=new Date(),ym=now.getFullYear()+'-'+pad(now.getMonth()+1);
   var recs=supplyData.filter(function(r){return r.date&&r.date.slice(0,7)===ym});
