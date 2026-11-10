@@ -414,7 +414,7 @@ function openPanel(mod){
   curMod=mod;
   var title=document.getElementById('pTitle'),body=document.getElementById('pBody');
   if(mod==='hospital'){title.textContent='🏥 เวรแพทย์ออกหน่วย';body.innerHTML=renderSched()+linkBtn('https://script.google.com/macros/s/AKfycbwPDB2wT_JsJReueV3DKhyEdk-I_lcRTbtC00fCGOliBKrDalHoyr7VT6zH4LNjVf9G/exec','เปิดตารางเวรเต็ม')}
-  else if(mod==='submarine'){title.textContent='🚢 ลงชื่ออยู่เวรห้อง';body.innerHTML=renderRoom();bindRoom()}
+  else if(mod==='submarine'){title.textContent='🚢 ลงชื่ออยู่เวรห้อง';body.innerHTML=renderRoom()+linkBtn('https://script.google.com/macros/s/AKfycbyvp6sZNTHTX5QxVwXlakdIiiq2Aocpde6QOtUnHRYHDYN__9nHuU5MT2TwFkOYf4yV/exec','เปิดระบบเวรห้องเต็ม');bindRoom()}
   else if(mod==='market'){title.textContent='🏪 Supply BB';body.innerHTML=renderSupply()+linkBtn(SUPPLY_API,'เปิด Supply BB ลงข้อมูล');fetchSupply()}
   document.getElementById('pnl').classList.add('open');
   document.getElementById('pov').classList.add('open');
