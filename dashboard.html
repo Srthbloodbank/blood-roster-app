@@ -1,0 +1,816 @@
+<title>แดชบอร์ดธนาคารเลือด</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: single-column card dashboard, mobile-first, three work modules */
+:root {
+  --bg: #f0f3f7;
+  --card: #ffffff;
+  --ink: #15202b;
+  --mute: #6b7a8d;
+  --line: #dae2ec;
+  --navy: #14263a;
+  --navylt: #1e3a56;
+  --crim: #a4162b;
+  --crimlt: #c9283e;
+  --ok: #1d7a4d;
+  --okbg: #e2f5eb;
+  --warn: #c77d00;
+  --warnbg: #fff4d6;
+  --water: #2583c6;
+  --waterbg: #e4f0fb;
+  --head: #e7ecf3;
+  --soft: #fafbfd;
+  --shadow: 0 1px 3px rgba(20,38,58,.07), 0 6px 20px rgba(20,38,58,.06);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1420; --card: #151f2d; --ink: #e4ebf4; --mute: #8a9bb0;
+    --line: #263548; --navy: #0b1520; --navylt: #182940; --crim: #ff6b7d;
+    --crimlt: #ff8a98; --ok: #6fcf97; --okbg: #132e22; --warn: #f0b040;
+    --warnbg: #2e2510; --water: #6cb8e6; --waterbg: #162a3e;
+    --head: #1a2b3d; --soft: #111c28;
+    --shadow: 0 1px 3px rgba(0,0,0,.25), 0 6px 20px rgba(0,0,0,.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1420; --card: #151f2d; --ink: #e4ebf4; --mute: #8a9bb0;
+  --line: #263548; --navy: #0b1520; --navylt: #182940; --crim: #ff6b7d;
+  --crimlt: #ff8a98; --ok: #6fcf97; --okbg: #132e22; --warn: #f0b040;
+  --warnbg: #2e2510; --water: #6cb8e6; --waterbg: #162a3e;
+  --head: #1a2b3d; --soft: #111c28;
+  --shadow: 0 1px 3px rgba(0,0,0,.25), 0 6px 20px rgba(0,0,0,.2);
+  color-scheme: dark;
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 "IBM Plex Sans Thai", system-ui, -apple-system, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 calc(24px + env(safe-area-inset-bottom, 0px));
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--navy);
+  z-index: 30;
+}
+* { box-sizing: border-box }
+h1,h2,h3 { margin: 0; font-weight: 700; text-wrap: balance }
+button { font: inherit; cursor: pointer }
+input, select { font: inherit; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100% }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--crim); outline-offset: 2px }
+.tnum { font-variant-numeric: tabular-nums }
+img { max-width: 100% }
+
+/* Top bar */
+.topbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--navy);
+  margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0 calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px max(16px, env(safe-area-inset-left, 0px)) 14px max(16px, env(safe-area-inset-right, 0px));
+  max-width: 960px;
+  margin: 0 auto;
+}
+.bar-icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  background: var(--crim);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+.bar-icon svg { width: 26px; height: 26px; display: block }
+.bar .tt { flex: 1; min-width: 0 }
+.bar .tt h1 { font-size: 20px; line-height: 1.25; color: #fff; font-weight: 800 }
+.bar .tt .sub { color: #9fb5cc; font-size: 12px; font-weight: 500; letter-spacing: .3px }
+.tbtn {
+  flex: none;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 10px;
+  width: 40px; height: 40px;
+  font-size: 17px;
+  display: grid; place-items: center;
+}
+.tbtn:hover { background: rgba(255,255,255,.2) }
+.tbtn svg { width: 20px; height: 20px }
+
+/* Date banner */
+.datebar {
+  text-align: center;
+  padding: 18px 0 6px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.datebar .day { font-size: 13px; color: var(--mute); font-weight: 500 }
+.datebar .full { font-size: 22px; font-weight: 800; color: var(--ink); margin-top: 2px }
+
+/* Module cards */
+.modules {
+  max-width: 960px;
+  margin: 14px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.mod {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.mod-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--soft);
+}
+.mod-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  flex: none;
+  font-size: 20px;
+}
+.mod-icon svg { width: 22px; height: 22px }
+.mod-icon.red { background: color-mix(in srgb, var(--crim) 14%, var(--card)); color: var(--crim) }
+.mod-icon.blue { background: var(--waterbg); color: var(--water) }
+.mod-icon.green { background: var(--okbg); color: var(--ok) }
+.mod-head h2 { font-size: 16px; flex: 1; min-width: 0 }
+.mod-head .badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge-ok { background: var(--okbg); color: var(--ok) }
+.badge-warn { background: var(--warnbg); color: var(--warn) }
+.badge-info { background: var(--waterbg); color: var(--water) }
+.mod-body { padding: 14px 16px }
+
+/* Module 1: เวรออกหน่วย */
+.sched-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.sched-row:last-child { border-bottom: 0 }
+.sched-date {
+  flex: none;
+  width: 50px;
+  text-align: center;
+}
+.sched-date .d { font-size: 26px; font-weight: 800; line-height: 1; color: var(--crim) }
+.sched-date .wd { font-size: 11px; color: var(--mute); margin-top: 2px }
+.sched-info { flex: 1; min-width: 0 }
+.sched-place { font-weight: 700; font-size: 15px }
+.sched-meta { font-size: 13px; color: var(--mute); margin-top: 2px }
+.sched-doc { font-size: 13px; margin-top: 4px }
+.sched-doc b { color: var(--crim) }
+.sched-today {
+  background: color-mix(in srgb, var(--water) 8%, var(--card));
+  border-left: 4px solid var(--water);
+  margin: 0 -16px;
+  padding: 14px 16px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+}
+.sched-today:last-child { border-bottom: 0 }
+.sched-today .sched-date .d { color: var(--water) }
+.tag-today {
+  display: inline-block;
+  background: var(--water);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Module 2: เวรห้อง */
+.shift-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.shift-tab {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--mute);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+.shift-tab.on {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.shift-tab .st-label { display: block; font-size: 11px; opacity: .75; margin-top: 1px }
+.checkin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.checkin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.checkin-row .avatar {
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  background: var(--head);
+  color: var(--mute);
+  display: grid; place-items: center;
+  font-size: 14px; font-weight: 700;
+  flex: none;
+}
+.checkin-row .ci-name { flex: 1; font-weight: 600; font-size: 14px }
+.checkin-row .ci-time { font-size: 12px; color: var(--mute); font-variant-numeric: tabular-nums }
+.checkin-row .ci-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.ci-badge.present { background: var(--okbg); color: var(--ok) }
+.ci-badge.absent { background: var(--head); color: var(--mute) }
+.checkin-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.checkin-form select { flex: 1; min-width: 0 }
+.btn {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--mute) }
+.btn.primary { background: var(--crim); color: #fff; border-color: var(--crim) }
+.btn.primary:hover { filter: brightness(1.08) }
+.btn.sm { padding: 8px 14px; font-size: 13px }
+.btn.ok { background: var(--ok); color: #fff; border-color: var(--ok) }
+.btn.ok:hover { filter: brightness(1.08) }
+.btn:disabled { opacity: .5; cursor: not-allowed }
+
+/* Module 3: Supply */
+.supply-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ss-card {
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+.ss-card.snack { background: color-mix(in srgb, #f0962e 10%, var(--card)); border-color: color-mix(in srgb, #f0962e 30%, var(--line)) }
+.ss-card.water { background: color-mix(in srgb, var(--water) 10%, var(--card)); border-color: color-mix(in srgb, var(--water) 30%, var(--line)) }
+.ss-card.rice { background: color-mix(in srgb, var(--ok) 10%, var(--card)); border-color: color-mix(in srgb, var(--ok) 30%, var(--line)) }
+.ss-card .ss-n { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums }
+.ss-card.snack .ss-n { color: #f0962e }
+.ss-card.water .ss-n { color: var(--water) }
+.ss-card.rice .ss-n { color: var(--ok) }
+.ss-card .ss-l { font-size: 11px; color: var(--mute); margin-top: 2px }
+.supply-recent {
+  font-size: 13px;
+  color: var(--mute);
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--line);
+}
+.supply-recent b { color: var(--ink) }
+
+/* Link buttons */
+.mod-foot {
+  padding: 0 16px 14px;
+}
+.link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  background: var(--soft);
+  color: var(--mute);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.link-btn:hover { border-color: var(--mute); color: var(--ink) }
+.link-btn svg { width: 16px; height: 16px; flex: none }
+
+/* Empty state */
+.empty-msg {
+  text-align: center;
+  padding: 16px 0;
+  color: var(--mute);
+  font-size: 13px;
+}
+
+/* Quick links grid */
+.quick-grid {
+  max-width: 960px;
+  margin: 14px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.qlink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+.qlink:hover { border-color: var(--mute) }
+.qlink .qi {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-size: 22px;
+}
+.qlink .qi.red { background: color-mix(in srgb, var(--crim) 12%, var(--card)) }
+.qlink .qi.blue { background: var(--waterbg) }
+.qlink .qi.green { background: var(--okbg) }
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%) translateY(16px);
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 50;
+  max-width: 90%;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0) }
+
+/* Responsive */
+@media (min-width: 700px) {
+  .modules { flex-direction: row; flex-wrap: wrap }
+  .mod { flex: 1; min-width: 280px }
+  .mod.full { flex-basis: 100% }
+}
+@media (max-width: 640px) {
+  .bar .tt h1 { font-size: 18px }
+  .datebar .full { font-size: 19px }
+  input, select { min-height: 44px }
+  .btn { min-height: 44px }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+
+<div class="topbar">
+  <div class="bar">
+    <div class="bar-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4" fill="#fff" stroke="none"/></svg>
+    </div>
+    <div class="tt">
+      <h1>งานธนาคารเลือด</h1>
+      <div class="sub">BLOOD BANK · โรงพยาบาลสุราษฎร์ธานี</div>
+    </div>
+    <button class="tbtn" id="themeBtn" title="สลับธีม" aria-label="สลับธีม">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="datebar">
+  <div class="day" id="dayLabel"></div>
+  <div class="full" id="dateLabel"></div>
+</div>
+
+<div class="modules">
+
+  <!-- Module 1: เวรแพทย์ออกหน่วย -->
+  <div class="mod full">
+    <div class="mod-head">
+      <div class="mod-icon red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 12h8M12 8v8"/></svg>
+      </div>
+      <h2>เวรแพทย์ออกหน่วย</h2>
+      <span class="badge badge-info" id="schedBadge">—</span>
+    </div>
+    <div class="mod-body" id="schedBody">
+      <div class="empty-msg">กำลังโหลด...</div>
+    </div>
+    <div class="mod-foot">
+      <a href="index.html" class="link-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        เปิดตารางเวรเต็ม
+      </a>
+    </div>
+  </div>
+
+  <!-- Module 2: ลงชื่ออยู่เวรห้อง -->
+  <div class="mod">
+    <div class="mod-head">
+      <div class="mod-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h2>ลงชื่ออยู่เวรห้อง</h2>
+      <span class="badge badge-ok" id="roomBadge">0 คน</span>
+    </div>
+    <div class="mod-body">
+      <div class="shift-tabs" id="shiftTabs"></div>
+      <div class="checkin-list" id="checkinList"></div>
+      <div class="checkin-form">
+        <select id="staffSelect" aria-label="เลือกชื่อ">
+          <option value="">— เลือกชื่อ —</option>
+        </select>
+        <button class="btn ok sm" id="checkinBtn" aria-label="ลงชื่อเวร">ลงชื่อ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Module 3: Supply BB -->
+  <div class="mod">
+    <div class="mod-head">
+      <div class="mod-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+      <h2>Supply BB</h2>
+      <span class="badge badge-ok" id="supplyBadge">—</span>
+    </div>
+    <div class="mod-body" id="supplyBody">
+      <div class="supply-stats" id="supplyStats">
+        <div class="ss-card snack"><div class="ss-n tnum" id="ssSnack">—</div><div class="ss-l">ขนม (ชิ้น)</div></div>
+        <div class="ss-card water"><div class="ss-n tnum" id="ssWater">—</div><div class="ss-l">น้ำ (ขวด)</div></div>
+        <div class="ss-card rice"><div class="ss-n tnum" id="ssRice">—</div><div class="ss-l">ข้าว (กล่อง)</div></div>
+      </div>
+      <div class="supply-recent" id="supplyRecent">เดือนนี้ยังไม่มีรายการบันทึก</div>
+    </div>
+    <div class="mod-foot">
+      <a href="supply/index.html" class="link-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        เปิด Supply BB เต็ม
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+var M = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+var W = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+var SHIFTS = [
+  { id: 'morning', label: 'เช้า', time: '08:00–16:00' },
+  { id: 'afternoon', label: 'บ่าย', time: '16:00–24:00' },
+  { id: 'night', label: 'ดึก', time: '00:00–08:00' }
+];
+
+var STAFF = [
+  "กิ่ง","จิ๋ว","แป๋ว","นุช","ปุ๊ก","แอน","อ้อย","เปิ้ล","หมวย","ต้อย",
+  "นิด","จอย","เอ๋","พี่อ้อ","พี่แมว","พี่ตุ๊ก","พี่เล็ก","พี่แหม่ม"
+];
+
+var SEED_EVENTS = [
+  {date:"2026-11-02",n:3,codes:["D01"],time:"8.30 น."},
+  {date:"2026-11-03",n:47,codes:["D02"],time:"8.30 น."},
+  {date:"2026-11-04",n:39,codes:["D03"],time:"8.30 น."},
+  {date:"2026-11-05",n:19,codes:["D04"],time:"8.30 น."},
+  {date:"2026-11-06",n:64,codes:["D05"],time:"8.30 น."},
+  {date:"2026-11-09",n:12,codes:["D06"],time:"8.30 น."},
+  {date:"2026-11-10",n:1,codes:["D07"],time:"8.30 น."},
+  {date:"2026-11-11",n:68,codes:["D08"],time:"8.30 น."},
+  {date:"2026-11-12",n:49,codes:["D09"],time:"8.30 น."},
+  {date:"2026-11-13",n:42,codes:["D10"],time:"8.30 น."},
+  {date:"2026-11-16",n:66,codes:["D11"],time:"8.30 น."},
+  {date:"2026-11-17",n:14,codes:["D12"],time:"8.30 น."},
+  {date:"2026-11-18",n:9,codes:["D13"],time:"8.30 น."},
+  {date:"2026-11-19",n:18,codes:["D14"],time:"8.30 น."},
+  {date:"2026-11-20",n:62,codes:["D15"],time:"8.30 น."},
+  {date:"2026-11-23",n:67,codes:["D16"],time:"8.30 น."},
+  {date:"2026-11-24",n:69,codes:["D17"],time:"8.30 น."},
+  {date:"2026-11-25",n:43,codes:["D18"],time:"8.30 น."},
+  {date:"2026-11-26",n:30,codes:["D19"],time:"8.30 น."},
+  {date:"2026-11-27",n:41,codes:["D20"],time:"8.30 น."}
+];
+
+var DOCS = [
+  {code:"D01",name:"นพ.ภูริณัฐ ธีรวิศรุต"},{code:"D02",name:"พญ.ดวงกมล บุญสงค์"},
+  {code:"D03",name:"นพ.กิตติธัช วิสาละ"},{code:"D04",name:"นพ.เจตนิพัทธ์ ปัญญา"},
+  {code:"D05",name:"นพ.ธัชพล วรานันตกุล"},{code:"D06",name:"พญ.ปิ่นรดา กิ่งโพธิ์ตัน"},
+  {code:"D07",name:"พญ.มนัชญา มาลารัตน์"},{code:"D08",name:"พญ.ทิชา สุวีรานุวัฒน์"},
+  {code:"D09",name:"พญ.ณัชชา เจนกิจวัฒนาเลิศ"},{code:"D10",name:"พญ.พชรภา เจียรพันธุ์"},
+  {code:"D11",name:"พญ.ปุญญิศา ทวี"},{code:"D12",name:"พญ.พชรมน วิเศษคณากุล"},
+  {code:"D13",name:"นพ.น่านเจ้า กันทะมัง"},{code:"D14",name:"พญ.วิศรุตา แก้วหัวไทร"},
+  {code:"D15",name:"พญ.กษมา บุญนำ"},{code:"D16",name:"นพ.ศุภชัย เชิงดี"},
+  {code:"D17",name:"พญ.ศุภิสรา กรดแก้ว"},{code:"D18",name:"พญ.ญาณิศา สาเมือง"},
+  {code:"D19",name:"นพ.กันต์ธีร์ ทองสีพราย"},{code:"D20",name:"พญ.ศุภสุดา ยิ่งยง"}
+];
+
+var PLACES = {1:"ค่ายวิภาวดีรังสิต",3:"ม.ราชภัฏสุราษฎร์ธานี",9:"อ.ชัยบุรี",12:"อ.ท่าฉาง",14:"อ.บ้านตาขุน",18:"อ.วิภาวดี",19:"บ.ซีพีแรม",30:"ม.สงขลานครินทร์ วิทยาเขตสุราษฎร์ธานี",39:"ร.ร.สุราษฎร์ธานี",41:"วิทยาลัยอาชีวศึกษาฯ",42:"ศาลจังหวัดเวียงสระ",43:"ศูนย์ฝึกอบรมตำรวจภูธรภาค 8",47:"ห้างเซ็นทรัลพลาซ่า",49:"บ.สิริสินสุราษฎร์ธานี",62:"รร.วังใต้",64:"ศูนย์การค้าโคลีเซี่ยมฯ",66:"รพ.สต.คลองสระ",67:"ศาลเยาวชน",68:"สนง.เทศบาลนครสุราษฎร์ธานี",69:"วิทยาลัยพยาบาล"};
+
+function esc(s) { return String(s==null?'':s).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] }) }
+function pad(n) { return n < 10 ? '0' + n : '' + n }
+function todayISO() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) }
+function docName(code) { for (var i = 0; i < DOCS.length; i++) if (DOCS[i].code === code) return DOCS[i].name; return code }
+function placeName(n) { return PLACES[n] || 'หน่วยที่ ' + n }
+
+// ===== Date display =====
+function renderDate() {
+  var d = new Date();
+  document.getElementById('dayLabel').textContent = 'วัน' + W[d.getDay()];
+  document.getElementById('dateLabel').textContent = d.getDate() + ' ' + M[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+}
+
+// ===== Theme =====
+var THEMES = ['auto','light','dark'];
+var theme = 'auto';
+try { var t = localStorage.getItem('dashTheme'); if (THEMES.indexOf(t) >= 0) theme = t } catch(e) {}
+function applyTheme() {
+  var r = document.documentElement;
+  if (theme === 'auto') r.removeAttribute('data-theme');
+  else r.setAttribute('data-theme', theme);
+  var btn = document.getElementById('themeBtn');
+  if (!btn) return;
+  var icons = {
+    auto: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
+    light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    dark: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
+  };
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' + icons[theme] + '</svg>';
+}
+document.getElementById('themeBtn').addEventListener('click', function() {
+  theme = THEMES[(THEMES.indexOf(theme) + 1) % 3];
+  try { localStorage.setItem('dashTheme', theme) } catch(e) {}
+  applyTheme();
+});
+
+// ===== Schedule (เวรออกหน่วย) =====
+function renderSchedule() {
+  var tdy = todayISO();
+  var upcoming = SEED_EVENTS.filter(function(e) { return e.date >= tdy }).slice(0, 5);
+  if (!upcoming.length) {
+    document.getElementById('schedBody').innerHTML = '<div class="empty-msg">ไม่มีเวรในช่วงนี้</div>';
+    document.getElementById('schedBadge').textContent = 'ไม่มีเวร';
+    return;
+  }
+  var todayEv = SEED_EVENTS.filter(function(e) { return e.date === tdy });
+  document.getElementById('schedBadge').textContent = todayEv.length ? 'วันนี้มีเวร' : 'เวรถัดไป';
+  document.getElementById('schedBadge').className = 'badge ' + (todayEv.length ? 'badge-warn' : 'badge-info');
+
+  var html = '';
+  upcoming.forEach(function(ev) {
+    var d = new Date(ev.date.replace(/-/g,'/'));
+    var isToday = ev.date === tdy;
+    var docs = ev.codes.map(function(c) { return docName(c) }).join(', ');
+    html += '<div class="' + (isToday ? 'sched-today' : 'sched-row') + '">';
+    html += '<div class="sched-date"><div class="d">' + d.getDate() + '</div><div class="wd">' + W[d.getDay()] + '</div></div>';
+    html += '<div class="sched-info"><div class="sched-place">' + esc(placeName(ev.n));
+    if (isToday) html += '<span class="tag-today">วันนี้</span>';
+    html += '</div>';
+    html += '<div class="sched-meta">' + esc(ev.time) + '</div>';
+    html += '<div class="sched-doc"><b>' + esc(ev.codes.join(', ')) + '</b> ' + esc(docs) + '</div>';
+    html += '</div></div>';
+  });
+  document.getElementById('schedBody').innerHTML = html;
+}
+
+// ===== Room duty (เวรห้อง) =====
+var currentShift = 'morning';
+var roomData = {};
+
+function detectShift() {
+  var h = new Date().getHours();
+  if (h >= 8 && h < 16) return 'morning';
+  if (h >= 16) return 'afternoon';
+  return 'night';
+}
+
+function loadRoomData() {
+  try {
+    var raw = localStorage.getItem('bbRoomDuty');
+    if (raw) roomData = JSON.parse(raw);
+  } catch(e) { roomData = {} }
+  if (!roomData || typeof roomData !== 'object') roomData = {};
+}
+
+function saveRoomData() {
+  try { localStorage.setItem('bbRoomDuty', JSON.stringify(roomData)) } catch(e) {}
+}
+
+function getRoomKey(shift) {
+  return todayISO() + '_' + shift;
+}
+
+function getCheckins(shift) {
+  var key = getRoomKey(shift);
+  return roomData[key] || [];
+}
+
+function renderShiftTabs() {
+  var html = '';
+  SHIFTS.forEach(function(s) {
+    var count = getCheckins(s.id).length;
+    html += '<button class="shift-tab' + (currentShift === s.id ? ' on' : '') + '" data-shift="' + s.id + '">';
+    html += s.label + (count ? ' (' + count + ')' : '');
+    html += '<span class="st-label">' + s.time + '</span></button>';
+  });
+  document.getElementById('shiftTabs').innerHTML = html;
+}
+
+function renderCheckins() {
+  var list = getCheckins(currentShift);
+  var totalToday = 0;
+  SHIFTS.forEach(function(s) { totalToday += getCheckins(s.id).length });
+  document.getElementById('roomBadge').textContent = totalToday + ' คน';
+
+  if (!list.length) {
+    document.getElementById('checkinList').innerHTML = '<div class="empty-msg">ยังไม่มีคนลงชื่อเวรนี้</div>';
+  } else {
+    var html = '';
+    list.forEach(function(item, idx) {
+      var initials = item.name.charAt(0);
+      html += '<div class="checkin-row">';
+      html += '<div class="avatar">' + esc(initials) + '</div>';
+      html += '<div class="ci-name">' + esc(item.name) + '</div>';
+      html += '<div class="ci-time">' + esc(item.time) + '</div>';
+      html += '<span class="ci-badge present">มาแล้ว</span>';
+      html += '</div>';
+    });
+    document.getElementById('checkinList').innerHTML = html;
+  }
+
+  var staffSel = document.getElementById('staffSelect');
+  var checkedNames = list.map(function(c) { return c.name });
+  var opts = '<option value="">— เลือกชื่อ —</option>';
+  STAFF.forEach(function(name) {
+    if (checkedNames.indexOf(name) < 0) {
+      opts += '<option value="' + esc(name) + '">' + esc(name) + '</option>';
+    }
+  });
+  staffSel.innerHTML = opts;
+}
+
+function renderRoom() {
+  renderShiftTabs();
+  renderCheckins();
+}
+
+document.getElementById('shiftTabs').addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-shift]');
+  if (!btn) return;
+  currentShift = btn.dataset.shift;
+  renderRoom();
+});
+
+document.getElementById('checkinBtn').addEventListener('click', function() {
+  var sel = document.getElementById('staffSelect');
+  var name = sel.value;
+  if (!name) return;
+  var now = new Date();
+  var time = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  var key = getRoomKey(currentShift);
+  if (!roomData[key]) roomData[key] = [];
+  roomData[key].push({ name: name, time: time });
+  saveRoomData();
+  renderRoom();
+  toast(name + ' ลงชื่อเวร' + SHIFTS.filter(function(s){return s.id===currentShift})[0].label + 'แล้ว');
+});
+
+// ===== Supply =====
+var supplyData = [];
+function loadSupply() {
+  try {
+    var raw = localStorage.getItem('bbSupplyDash');
+    if (raw) supplyData = JSON.parse(raw);
+  } catch(e) { supplyData = [] }
+  if (!Array.isArray(supplyData)) supplyData = [];
+}
+
+function renderSupply() {
+  var now = new Date();
+  var ym = now.getFullYear() + '-' + pad(now.getMonth() + 1);
+  var monthRecs = supplyData.filter(function(r) { return r.date && r.date.slice(0,7) === ym });
+  var totSnack = 0, totWater = 0, totRice = 0;
+  monthRecs.forEach(function(r) {
+    totSnack += (r.snack || 0);
+    totWater += (r.water || 0);
+    totRice += (r.rice || 0);
+  });
+
+  document.getElementById('ssSnack').textContent = totSnack || '—';
+  document.getElementById('ssWater').textContent = totWater || '—';
+  document.getElementById('ssRice').textContent = totRice || '—';
+
+  var badge = document.getElementById('supplyBadge');
+  badge.textContent = monthRecs.length + ' รายการ';
+  badge.className = 'badge ' + (monthRecs.length ? 'badge-ok' : 'badge-info');
+
+  if (monthRecs.length) {
+    var last = monthRecs[monthRecs.length - 1];
+    document.getElementById('supplyRecent').innerHTML =
+      'ล่าสุด: <b>' + esc(last.place || last.date) + '</b> — ' +
+      'ขนม ' + (last.snack||0) + ', น้ำ ' + (last.water||0) + ', ข้าว ' + (last.rice||0);
+  } else {
+    document.getElementById('supplyRecent').textContent = M[now.getMonth()] + ' ' + (now.getFullYear()+543) + ' — ยังไม่มีรายการ';
+  }
+}
+
+// ===== Toast =====
+var _tt = null;
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show';
+  clearTimeout(_tt);
+  _tt = setTimeout(function() { el.className = 'toast' }, 2200);
+}
+
+// ===== Init =====
+renderDate();
+applyTheme();
+currentShift = detectShift();
+loadRoomData();
+renderSchedule();
+renderRoom();
+loadSupply();
+renderSupply();
+
+// Cleanup old room data (keep only last 7 days)
+try {
+  var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+  var cutKey = cutoff.getFullYear() + '-' + pad(cutoff.getMonth()+1) + '-' + pad(cutoff.getDate());
+  Object.keys(roomData).forEach(function(k) {
+    if (k < cutKey) delete roomData[k];
+  });
+  saveRoomData();
+} catch(e) {}
+
+})();
+</script>
