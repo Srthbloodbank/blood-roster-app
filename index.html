@@ -439,12 +439,23 @@ var DOCS=[
 var PLACES={1:"ค่ายวิภาวดีรังสิต",3:"ม.ราชภัฏสุราษฎร์ธานี",9:"อ.ชัยบุรี",12:"อ.ท่าฉาง",14:"อ.บ้านตาขุน",18:"อ.วิภาวดี",19:"บ.ซีพีแรม",30:"ม.สงขลานครินทร์ฯ",39:"ร.ร.สุราษฎร์ธานี",41:"วิทยาลัยอาชีวศึกษาฯ",42:"ศาลจังหวัดเวียงสระ",43:"ศูนย์ฝึกตำรวจภูธรภาค 8",47:"ห้างเซ็นทรัลพลาซ่า",49:"บ.สิริสินสุราษฎร์ธานี",62:"รร.วังใต้",64:"ศูนย์การค้าโคลีเซี่ยมฯ",66:"รพ.สต.คลองสระ",67:"ศาลเยาวชน",68:"สนง.เทศบาลนครสุราษฎร์ธานี",69:"วิทยาลัยพยาบาล"};
 
 var SUPPLY_API='https://script.google.com/macros/s/AKfycbxXzn1pFVTcPKeH2NhZvCEh_BfrIff8nTpUBUymCMyfwUNg0yHyWH4kvy5-sehWX7Ov5w/exec';
+var HOSPITAL_API='https://script.google.com/macros/s/AKfycbwPDB2wT_JsJReueV3DKhyEdk-I_lcRTbtC00fCGOliBKrDalHoyr7VT6zH4LNjVf9G/exec';
+var SUBMARINE_API='https://script.google.com/macros/s/AKfycbyvp6sZNTHTX5QxVwXlakdIiiq2Aocpde6QOtUnHRYHDYN__9nHuU5MT2TwFkOYf4yV/exec';
+
+var liveEvents=null,liveDocs=null,livePlaces=null,liveCoords=null;
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function pad(n){return n<10?'0'+n:''+n}
 function todayISO(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
-function docName(c){for(var i=0;i<DOCS.length;i++)if(DOCS[i].code===c)return DOCS[i].name;return c}
-function placeName(n){return PLACES[n]||'หน่วยที่ '+n}
+function docName(c){
+  var list=liveDocs||DOCS;
+  for(var i=0;i<list.length;i++)if(list[i].code===c)return list[i].name;
+  return c;
+}
+function placeName(n){
+  if(livePlaces){for(var i=0;i<livePlaces.length;i++)if(+livePlaces[i].n===+n)return livePlaces[i].name}
+  return PLACES[n]||'หน่วยที่ '+n;
+}
 
 /* ocean scene */
 function buildOcean(){
@@ -505,7 +516,8 @@ document.querySelectorAll('.tile.main').forEach(function(el){
 
 /* schedule */
 function renderSched(){
-  var tdy=todayISO(),up=SEED.filter(function(e){return e.date>=tdy}).slice(0,5);
+  var events=liveEvents||SEED;
+  var tdy=todayISO(),up=events.filter(function(e){return e.date>=tdy}).slice(0,5);
   if(!up.length)return'<div class="emsg">ไม่มีเวรในช่วงนี้</div>';
   var h='';
   up.forEach(function(ev){
@@ -562,6 +574,53 @@ function signInByName(name){
   roomData[key].push({name:matched,time:time});saveRoom();updateBadges();
   if(curMod==='submarine')refreshRoom();
   toast(matched+' ลงชื่อเวร'+SHIFTS.filter(function(s){return s.id===curShift})[0].label+'แล้ว');
+}
+
+/* ====== HOSPITAL API (เวรแพทย์) ====== */
+function loadHospital(){
+  try{var r=localStorage.getItem('bbHospDash');if(r){var d=JSON.parse(r);if(d.docs)liveDocs=d.docs;if(d.places)livePlaces=d.places;if(d.events)liveEvents=d.events;if(d.coords)liveCoords=d.coords}}catch(e){}
+  fetchHospital();
+}
+function fetchHospital(){
+  var cb='_hospCb'+Date.now();
+  window[cb]=function(d){
+    delete window[cb];var s=document.getElementById('hospJsonp');if(s)s.remove();
+    if(d&&d.cfg){
+      if(d.cfg.docs&&d.cfg.docs.length)liveDocs=d.cfg.docs;
+      if(d.cfg.places&&d.cfg.places.length)livePlaces=d.cfg.places;
+      if(d.cfg.coords)liveCoords=d.cfg.coords;
+    }
+    if(d&&d.events&&d.events.length)liveEvents=d.events;
+    try{localStorage.setItem('bbHospDash',JSON.stringify({docs:liveDocs,places:livePlaces,events:liveEvents,coords:liveCoords}))}catch(e){}
+    updateBadges();
+    if(curMod==='hospital'){document.getElementById('pBody').innerHTML=renderSched()}
+  };
+  var s=document.createElement('script');s.id='hospJsonp';s.src=HOSPITAL_API+'?callback='+cb;
+  s.onerror=function(){delete window[cb];s.remove()};
+  document.head.appendChild(s);
+}
+
+/* ====== SUBMARINE API (ลงชื่อเวรห้อง) ====== */
+function fetchSubmarine(){
+  var cb='_subCb'+Date.now();
+  window[cb]=function(d){
+    delete window[cb];var s=document.getElementById('subJsonp');if(s)s.remove();
+    if(d&&typeof d==='object'){
+      try{localStorage.setItem('bbSubLive',JSON.stringify(d))}catch(e){}
+      if(d.checkins){
+        var tdy=todayISO();
+        SHIFTS.forEach(function(sh){
+          var key=tdy+'_'+sh.id;
+          if(d.checkins[sh.id]&&!roomData[key]){roomData[key]=d.checkins[sh.id];saveRoom()}
+        });
+      }
+      updateBadges();
+      if(curMod==='submarine')refreshRoom();
+    }
+  };
+  var s=document.createElement('script');s.id='subJsonp';s.src=SUBMARINE_API+'?callback='+cb;
+  s.onerror=function(){delete window[cb];s.remove()};
+  document.head.appendChild(s);
 }
 
 /* supply */
@@ -635,7 +694,8 @@ function bindSupplyForm(){
 
 /* badges */
 function updateBadges(){
-  var tdy=todayISO(),todayEv=SEED.filter(function(e){return e.date===tdy});
+  var events=liveEvents||SEED;
+  var tdy=todayISO(),todayEv=events.filter(function(e){return e.date===tdy});
   var bH=document.getElementById('bHosp');
   bH.textContent=todayEv.length?'วันนี้มีเวร':'เวรถัดไป';
   bH.className='t-badge'+(todayEv.length?' live':'');
@@ -748,7 +808,7 @@ function processVoice(txt){
 }
 
 /* init */
-buildOcean();tickClock();setInterval(tickClock,1000);applyTheme();
+buildOcean();tickClock();setInterval(tickClock,1000);applyTheme();loadHospital();fetchSubmarine();
 curShift=detectShift();loadRoom();loadSupply();updateBadges();
 try{var cut=new Date();cut.setDate(cut.getDate()-7);var ck=cut.getFullYear()+'-'+pad(cut.getMonth()+1)+'-'+pad(cut.getDate());Object.keys(roomData).forEach(function(k){if(k<ck)delete roomData[k]});saveRoom()}catch(e){}
 })();
