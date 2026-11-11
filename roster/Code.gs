@@ -71,7 +71,13 @@ var SEED={
 {"id":"2026-10-30","date":"2026-10-30","n":42,"codes":["D17"],"orig":["D17"],"time":"8.30 น."}
 ]
 };
-function doGet(){
+function doGet(e){
+  var cb=e&&e.parameter&&e.parameter.callback;
+  if(cb){
+    var data=getState();
+    var json=JSON.stringify(data);
+    return ContentService.createTextOutput(cb+'('+json+')').setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
   return HtmlService.createHtmlOutputFromFile('Index').setTitle('เวรแพทย์ออกหน่วย')
     .addMetaTag('viewport','width=device-width, initial-scale=1, viewport-fit=cover')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
