@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
 <title>BBMS — Blood Bank Management System</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap">
@@ -288,7 +292,8 @@ textarea{resize:vertical;min-height:40px}
 }
 @media(prefers-reduced-motion:reduce){*,.bbl,.fish,.ray,.pdot,.tile.main .t-plat,.critter{animation:none!important;transition:none!important}}
 </style>
-
+</head>
+<body>
 <div class="ocean" id="ocean"></div>
 
 <div class="hdr">
@@ -813,3 +818,5 @@ curShift=detectShift();loadRoom();loadSupply();updateBadges();
 try{var cut=new Date();cut.setDate(cut.getDate()-7);var ck=cut.getFullYear()+'-'+pad(cut.getMonth()+1)+'-'+pad(cut.getDate());Object.keys(roomData).forEach(function(k){if(k<ck)delete roomData[k]});saveRoom()}catch(e){}
 })();
 </script>
+</body>
+</html>
